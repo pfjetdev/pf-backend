@@ -1,0 +1,1 @@
+{"version":3,"sources":["../../../src/beat-my-price/dto/update-beat-my-price.dto.ts"],"sourcesContent":["export class UpdateBeatMyPriceDto {\n  status?: string;\n  ourPrice?: number | null;\n  agentId?: string | null;\n  agentNotes?: string;\n}\n"],"names":["UpdateBeatMyPriceDto"],"mappings":";;;;+BAAaA;;;eAAAA;;;AAAN,IAAA,AAAMA,uBAAN,MAAMA;AAKb"}
