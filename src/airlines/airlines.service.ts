@@ -7,7 +7,7 @@ import { UpdateAirlineDto } from './dto/update-airline.dto';
 export class AirlinesService {
   constructor(private prisma: PrismaService) {}
 
-  /** Normalize routeCodes: accept string "DXB,AUH" or string[] */
+  /** Normalize routeCodes: accept string "DXB,AUH" or stуring[] */
   private normalizeRouteCodes(codes: string[] | string | undefined): string[] | undefined {
     if (codes === undefined) return undefined;
     if (typeof codes === 'string') {

@@ -20,7 +20,7 @@ function _ts_metadata(k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 }
 let AirlinesService = class AirlinesService {
-    /** Normalize routeCodes: accept string "DXB,AUH" or string[] */ normalizeRouteCodes(codes) {
+    /** Normalize routeCodes: accept string "DXB,AUH" or stуring[] */ normalizeRouteCodes(codes) {
         if (codes === undefined) return undefined;
         if (typeof codes === 'string') {
             return codes.split(',').map((c)=>c.trim()).filter(Boolean);
