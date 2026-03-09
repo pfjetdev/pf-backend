@@ -13,6 +13,8 @@ import { AgentsModule } from './agents/agents.module';
 import { EventsModule } from './events/events.module';
 import { SettingsModule } from './settings/settings.module';
 import { AnalyticsModule } from './analytics/analytics.module';
+import { FlightsModule } from './flights/flights.module';
+import { CatalogModule } from './catalog/catalog.module';
 
 @Module({
   imports: [
@@ -22,6 +24,8 @@ import { AnalyticsModule } from './analytics/analytics.module';
     EventsModule,
     SettingsModule,
     AnalyticsModule,
+    FlightsModule,
+    CatalogModule,
     LeadsModule,
     DealsModule,
     DestinationsModule,

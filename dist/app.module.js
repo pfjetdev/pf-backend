@@ -23,6 +23,8 @@ const _agentsmodule = require("./agents/agents.module");
 const _eventsmodule = require("./events/events.module");
 const _settingsmodule = require("./settings/settings.module");
 const _analyticsmodule = require("./analytics/analytics.module");
+const _flightsmodule = require("./flights/flights.module");
+const _catalogmodule = require("./catalog/catalog.module");
 function _ts_decorate(decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -40,6 +42,8 @@ AppModule = _ts_decorate([
             _eventsmodule.EventsModule,
             _settingsmodule.SettingsModule,
             _analyticsmodule.AnalyticsModule,
+            _flightsmodule.FlightsModule,
+            _catalogmodule.CatalogModule,
             _leadsmodule.LeadsModule,
             _dealsmodule.DealsModule,
             _destinationsmodule.DestinationsModule,

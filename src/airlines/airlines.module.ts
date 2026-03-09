@@ -5,5 +5,6 @@ import { AirlinesService } from './airlines.service';
 @Module({
   controllers: [AirlinesController],
   providers: [AirlinesService],
+  exports: [AirlinesService],
 })
 export class AirlinesModule {}

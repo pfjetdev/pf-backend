@@ -26,6 +26,9 @@ DealsModule = _ts_decorate([
         ],
         providers: [
             _dealsservice.DealsService
+        ],
+        exports: [
+            _dealsservice.DealsService
         ]
     })
 ], DealsModule);

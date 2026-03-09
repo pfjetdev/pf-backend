@@ -26,6 +26,9 @@ AirlinesModule = _ts_decorate([
         ],
         providers: [
             _airlinesservice.AirlinesService
+        ],
+        exports: [
+            _airlinesservice.AirlinesService
         ]
     })
 ], AirlinesModule);
