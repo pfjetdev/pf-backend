@@ -296,8 +296,9 @@ const AbVariantViewScalarFieldEnum = {
     id: 'id',
     variant: 'variant',
     page: 'page',
+    visitorId: 'visitorId',
     date: 'date',
-    count: 'count'
+    createdAt: 'createdAt'
 };
 const SortOrder = {
     asc: 'asc',

@@ -5,14 +5,15 @@ import { PrismaService } from '../prisma/prisma.service';
 export class AnalyticsService {
   constructor(private prisma: PrismaService) {}
 
-  async trackVariantView(variant: string, page: string = 'search') {
+  async trackVariantView(variant: string, page: string = 'search', visitorId: string) {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
+    // One visitor = one view per page per day (duplicates ignored)
     await this.prisma.abVariantView.upsert({
-      where: { variant_page_date: { variant, page, date: today } },
-      update: { count: { increment: 1 } },
-      create: { variant, page, date: today, count: 1 },
+      where: { visitorId_page_date: { visitorId, page, date: today } },
+      update: {},
+      create: { variant, page, visitorId, date: today },
     });
   }
 }

@@ -29,14 +29,19 @@ const VALID_PAGES = [
     'homepage'
 ];
 let AnalyticsController = class AnalyticsController {
-    async trackVariantView(variant, page) {
+    async trackVariantView(variant, page, visitorId) {
         if (variant !== 'A' && variant !== 'B') {
             return {
                 ok: false
             };
         }
+        if (!visitorId || typeof visitorId !== 'string' || visitorId.length > 200) {
+            return {
+                ok: false
+            };
+        }
         const safePage = page && VALID_PAGES.includes(page) ? page : 'search';
-        await this.analyticsService.trackVariantView(variant, safePage);
+        await this.analyticsService.trackVariantView(variant, safePage, visitorId);
         return {
             ok: true
         };
@@ -49,8 +54,10 @@ _ts_decorate([
     (0, _common.Post)('variant-view'),
     _ts_param(0, (0, _common.Body)('variant')),
     _ts_param(1, (0, _common.Body)('page')),
+    _ts_param(2, (0, _common.Body)('visitorId')),
     _ts_metadata("design:type", Function),
     _ts_metadata("design:paramtypes", [
+        String,
         String,
         String
     ]),

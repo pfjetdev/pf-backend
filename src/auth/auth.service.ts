@@ -40,6 +40,10 @@ export class AuthService {
   }
 
   async setup(email: string, password: string, name: string) {
+    if (!email || !password || !name) {
+      throw new UnauthorizedException('email, password and name are required');
+    }
+
     const adminCount = await this.prisma.agent.count({ where: { role: 'admin' } });
     if (adminCount > 0) {
       throw new UnauthorizedException('Admin already exists. Use /auth/login');

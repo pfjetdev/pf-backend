@@ -99,6 +99,9 @@ let AuthService = class AuthService {
         };
     }
     async setup(email, password, name) {
+        if (!email || !password || !name) {
+            throw new _common.UnauthorizedException('email, password and name are required');
+        }
         const adminCount = await this.prisma.agent.count({
             where: {
                 role: 'admin'

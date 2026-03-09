@@ -1373,8 +1373,9 @@ export const AbVariantViewScalarFieldEnum = {
   id: 'id',
   variant: 'variant',
   page: 'page',
+  visitorId: 'visitorId',
   date: 'date',
-  count: 'count'
+  createdAt: 'createdAt'
 } as const
 
 export type AbVariantViewScalarFieldEnum = (typeof AbVariantViewScalarFieldEnum)[keyof typeof AbVariantViewScalarFieldEnum]

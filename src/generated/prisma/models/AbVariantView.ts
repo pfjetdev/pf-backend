@@ -20,76 +20,64 @@ export type AbVariantViewModel = runtime.Types.Result.DefaultSelection<Prisma.$A
 
 export type AggregateAbVariantView = {
   _count: AbVariantViewCountAggregateOutputType | null
-  _avg: AbVariantViewAvgAggregateOutputType | null
-  _sum: AbVariantViewSumAggregateOutputType | null
   _min: AbVariantViewMinAggregateOutputType | null
   _max: AbVariantViewMaxAggregateOutputType | null
-}
-
-export type AbVariantViewAvgAggregateOutputType = {
-  count: number | null
-}
-
-export type AbVariantViewSumAggregateOutputType = {
-  count: number | null
 }
 
 export type AbVariantViewMinAggregateOutputType = {
   id: string | null
   variant: string | null
   page: string | null
+  visitorId: string | null
   date: Date | null
-  count: number | null
+  createdAt: Date | null
 }
 
 export type AbVariantViewMaxAggregateOutputType = {
   id: string | null
   variant: string | null
   page: string | null
+  visitorId: string | null
   date: Date | null
-  count: number | null
+  createdAt: Date | null
 }
 
 export type AbVariantViewCountAggregateOutputType = {
   id: number
   variant: number
   page: number
+  visitorId: number
   date: number
-  count: number
+  createdAt: number
   _all: number
 }
 
-
-export type AbVariantViewAvgAggregateInputType = {
-  count?: true
-}
-
-export type AbVariantViewSumAggregateInputType = {
-  count?: true
-}
 
 export type AbVariantViewMinAggregateInputType = {
   id?: true
   variant?: true
   page?: true
+  visitorId?: true
   date?: true
-  count?: true
+  createdAt?: true
 }
 
 export type AbVariantViewMaxAggregateInputType = {
   id?: true
   variant?: true
   page?: true
+  visitorId?: true
   date?: true
-  count?: true
+  createdAt?: true
 }
 
 export type AbVariantViewCountAggregateInputType = {
   id?: true
   variant?: true
   page?: true
+  visitorId?: true
   date?: true
-  count?: true
+  createdAt?: true
   _all?: true
 }
 
@@ -131,18 +119,6 @@ export type AbVariantViewAggregateArgs<ExtArgs extends runtime.Types.Extensions.
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
-   * Select which fields to average
-  **/
-  _avg?: AbVariantViewAvgAggregateInputType
-  /**
-   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-   * 
-   * Select which fields to sum
-  **/
-  _sum?: AbVariantViewSumAggregateInputType
-  /**
-   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-   * 
    * Select which fields to find the minimum value
   **/
   _min?: AbVariantViewMinAggregateInputType
@@ -173,8 +149,6 @@ export type AbVariantViewGroupByArgs<ExtArgs extends runtime.Types.Extensions.In
   take?: number
   skip?: number
   _count?: AbVariantViewCountAggregateInputType | true
-  _avg?: AbVariantViewAvgAggregateInputType
-  _sum?: AbVariantViewSumAggregateInputType
   _min?: AbVariantViewMinAggregateInputType
   _max?: AbVariantViewMaxAggregateInputType
 }
@@ -183,11 +157,10 @@ export type AbVariantViewGroupByOutputType = {
   id: string
   variant: string
   page: string
+  visitorId: string
   date: Date
-  count: number
+  createdAt: Date
   _count: AbVariantViewCountAggregateOutputType | null
-  _avg: AbVariantViewAvgAggregateOutputType | null
-  _sum: AbVariantViewSumAggregateOutputType | null
   _min: AbVariantViewMinAggregateOutputType | null
   _max: AbVariantViewMaxAggregateOutputType | null
 }
@@ -214,41 +187,43 @@ export type AbVariantViewWhereInput = {
   id?: Prisma.UuidFilter<"AbVariantView"> | string
   variant?: Prisma.StringFilter<"AbVariantView"> | string
   page?: Prisma.StringFilter<"AbVariantView"> | string
+  visitorId?: Prisma.StringFilter<"AbVariantView"> | string
   date?: Prisma.DateTimeFilter<"AbVariantView"> | Date | string
-  count?: Prisma.IntFilter<"AbVariantView"> | number
+  createdAt?: Prisma.DateTimeFilter<"AbVariantView"> | Date | string
 }
 
 export type AbVariantViewOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   variant?: Prisma.SortOrder
   page?: Prisma.SortOrder
+  visitorId?: Prisma.SortOrder
   date?: Prisma.SortOrder
-  count?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
 }
 
 export type AbVariantViewWhereUniqueInput = Prisma.AtLeast<{
   id?: string
-  variant_page_date?: Prisma.AbVariantViewVariantPageDateCompoundUniqueInput
+  visitorId_page_date?: Prisma.AbVariantViewVisitorIdPageDateCompoundUniqueInput
   AND?: Prisma.AbVariantViewWhereInput | Prisma.AbVariantViewWhereInput[]
   OR?: Prisma.AbVariantViewWhereInput[]
   NOT?: Prisma.AbVariantViewWhereInput | Prisma.AbVariantViewWhereInput[]
   variant?: Prisma.StringFilter<"AbVariantView"> | string
   page?: Prisma.StringFilter<"AbVariantView"> | string
+  visitorId?: Prisma.StringFilter<"AbVariantView"> | string
   date?: Prisma.DateTimeFilter<"AbVariantView"> | Date | string
-  count?: Prisma.IntFilter<"AbVariantView"> | number
-}, "id" | "variant_page_date">
+  createdAt?: Prisma.DateTimeFilter<"AbVariantView"> | Date | string
+}, "id" | "visitorId_page_date">
 
 export type AbVariantViewOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   variant?: Prisma.SortOrder
   page?: Prisma.SortOrder
+  visitorId?: Prisma.SortOrder
   date?: Prisma.SortOrder
-  count?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
   _count?: Prisma.AbVariantViewCountOrderByAggregateInput
-  _avg?: Prisma.AbVariantViewAvgOrderByAggregateInput
   _max?: Prisma.AbVariantViewMaxOrderByAggregateInput
   _min?: Prisma.AbVariantViewMinOrderByAggregateInput
-  _sum?: Prisma.AbVariantViewSumOrderByAggregateInput
 }
 
 export type AbVariantViewScalarWhereWithAggregatesInput = {
@@ -258,68 +233,76 @@ export type AbVariantViewScalarWhereWithAggregatesInput = {
   id?: Prisma.UuidWithAggregatesFilter<"AbVariantView"> | string
   variant?: Prisma.StringWithAggregatesFilter<"AbVariantView"> | string
   page?: Prisma.StringWithAggregatesFilter<"AbVariantView"> | string
+  visitorId?: Prisma.StringWithAggregatesFilter<"AbVariantView"> | string
   date?: Prisma.DateTimeWithAggregatesFilter<"AbVariantView"> | Date | string
-  count?: Prisma.IntWithAggregatesFilter<"AbVariantView"> | number
+  createdAt?: Prisma.DateTimeWithAggregatesFilter<"AbVariantView"> | Date | string
 }
 
 export type AbVariantViewCreateInput = {
   id?: string
   variant: string
   page?: string
+  visitorId: string
   date: Date | string
-  count?: number
+  createdAt?: Date | string
 }
 
 export type AbVariantViewUncheckedCreateInput = {
   id?: string
   variant: string
   page?: string
+  visitorId: string
   date: Date | string
-  count?: number
+  createdAt?: Date | string
 }
 
 export type AbVariantViewUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   variant?: Prisma.StringFieldUpdateOperationsInput | string
   page?: Prisma.StringFieldUpdateOperationsInput | string
+  visitorId?: Prisma.StringFieldUpdateOperationsInput | string
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  count?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type AbVariantViewUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   variant?: Prisma.StringFieldUpdateOperationsInput | string
   page?: Prisma.StringFieldUpdateOperationsInput | string
+  visitorId?: Prisma.StringFieldUpdateOperationsInput | string
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  count?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type AbVariantViewCreateManyInput = {
   id?: string
   variant: string
   page?: string
+  visitorId: string
   date: Date | string
-  count?: number
+  createdAt?: Date | string
 }
 
 export type AbVariantViewUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   variant?: Prisma.StringFieldUpdateOperationsInput | string
   page?: Prisma.StringFieldUpdateOperationsInput | string
+  visitorId?: Prisma.StringFieldUpdateOperationsInput | string
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  count?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type AbVariantViewUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   variant?: Prisma.StringFieldUpdateOperationsInput | string
   page?: Prisma.StringFieldUpdateOperationsInput | string
+  visitorId?: Prisma.StringFieldUpdateOperationsInput | string
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  count?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
-export type AbVariantViewVariantPageDateCompoundUniqueInput = {
-  variant: string
+export type AbVariantViewVisitorIdPageDateCompoundUniqueInput = {
+  visitorId: string
   page: string
   date: Date | string
 }
@@ -328,32 +311,27 @@ export type AbVariantViewCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   variant?: Prisma.SortOrder
   page?: Prisma.SortOrder
+  visitorId?: Prisma.SortOrder
   date?: Prisma.SortOrder
-  count?: Prisma.SortOrder
-}
-
-export type AbVariantViewAvgOrderByAggregateInput = {
-  count?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
 }
 
 export type AbVariantViewMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   variant?: Prisma.SortOrder
   page?: Prisma.SortOrder
+  visitorId?: Prisma.SortOrder
   date?: Prisma.SortOrder
-  count?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
 }
 
 export type AbVariantViewMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   variant?: Prisma.SortOrder
   page?: Prisma.SortOrder
+  visitorId?: Prisma.SortOrder
   date?: Prisma.SortOrder
-  count?: Prisma.SortOrder
-}
-
-export type AbVariantViewSumOrderByAggregateInput = {
-  count?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
 }
 
 
@@ -362,35 +340,39 @@ export type AbVariantViewSelect<ExtArgs extends runtime.Types.Extensions.Interna
   id?: boolean
   variant?: boolean
   page?: boolean
+  visitorId?: boolean
   date?: boolean
-  count?: boolean
+  createdAt?: boolean
 }, ExtArgs["result"]["abVariantView"]>
 
 export type AbVariantViewSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   variant?: boolean
   page?: boolean
+  visitorId?: boolean
   date?: boolean
-  count?: boolean
+  createdAt?: boolean
 }, ExtArgs["result"]["abVariantView"]>
 
 export type AbVariantViewSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   variant?: boolean
   page?: boolean
+  visitorId?: boolean
   date?: boolean
-  count?: boolean
+  createdAt?: boolean
 }, ExtArgs["result"]["abVariantView"]>
 
 export type AbVariantViewSelectScalar = {
   id?: boolean
   variant?: boolean
   page?: boolean
+  visitorId?: boolean
   date?: boolean
-  count?: boolean
+  createdAt?: boolean
 }
 
-export type AbVariantViewOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "variant" | "page" | "date" | "count", ExtArgs["result"]["abVariantView"]>
+export type AbVariantViewOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "variant" | "page" | "visitorId" | "date" | "createdAt", ExtArgs["result"]["abVariantView"]>
 
 export type $AbVariantViewPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "AbVariantView"
@@ -399,8 +381,9 @@ export type $AbVariantViewPayload<ExtArgs extends runtime.Types.Extensions.Inter
     id: string
     variant: string
     page: string
+    visitorId: string
     date: Date
-    count: number
+    createdAt: Date
   }, ExtArgs["result"]["abVariantView"]>
   composites: {}
 }
@@ -827,8 +810,9 @@ export interface AbVariantViewFieldRefs {
   readonly id: Prisma.FieldRef<"AbVariantView", 'String'>
   readonly variant: Prisma.FieldRef<"AbVariantView", 'String'>
   readonly page: Prisma.FieldRef<"AbVariantView", 'String'>
+  readonly visitorId: Prisma.FieldRef<"AbVariantView", 'String'>
   readonly date: Prisma.FieldRef<"AbVariantView", 'DateTime'>
-  readonly count: Prisma.FieldRef<"AbVariantView", 'Int'>
+  readonly createdAt: Prisma.FieldRef<"AbVariantView", 'DateTime'>
 }
     
 

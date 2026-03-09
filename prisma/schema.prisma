@@ -211,14 +211,16 @@ model SiteSetting {
   @@map("site_settings")
 }
 
-// 10. ab_variant_views — счётчик просмотров A/B вариантов (по дням)
+// 10. ab_variant_views — уникальные просмотры A/B вариантов (по visitor + день)
 model AbVariantView {
-  id      String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  variant String
-  page    String   @default("search")
-  date    DateTime @db.Date
-  count   Int      @default(1)
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  variant   String
+  page      String   @default("search")
+  visitorId String   @map("visitor_id")
+  date      DateTime @db.Date
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
 
-  @@unique([variant, page, date])
+  @@unique([visitorId, page, date])
+  @@index([variant, page, date])
   @@map("ab_variant_views")
 }

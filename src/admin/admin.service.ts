@@ -98,11 +98,12 @@ export class AdminService {
       this.prisma.abVariantView.groupBy({
         by: ['variant'],
         where: { page },
-        _sum: { count: true },
+        _count: true,
       }),
-      this.prisma.abVariantView.findMany({
+      this.prisma.abVariantView.groupBy({
+        by: ['variant', 'date'],
         where: { date: { gte: thirtyDaysAgo }, page },
-        orderBy: { date: 'asc' },
+        _count: true,
       }),
     ]);
 
@@ -124,14 +125,14 @@ export class AdminService {
     for (const view of viewsRaw) {
       const key = view.date.toISOString().slice(0, 10);
       if (key in dayCounts) {
-        if (view.variant === 'A') dayCounts[key].viewsA += view.count;
-        else if (view.variant === 'B') dayCounts[key].viewsB += view.count;
+        if (view.variant === 'A') dayCounts[key].viewsA += view._count;
+        else if (view.variant === 'B') dayCounts[key].viewsB += view._count;
       }
     }
 
-    // Total views by variant
-    const viewsA = viewsTotal.find((v) => v.variant === 'A')?._sum.count ?? 0;
-    const viewsB = viewsTotal.find((v) => v.variant === 'B')?._sum.count ?? 0;
+    // Total views by variant (each row = unique visitor per day)
+    const viewsA = viewsTotal.find((v) => v.variant === 'A')?._count ?? 0;
+    const viewsB = viewsTotal.find((v) => v.variant === 'B')?._count ?? 0;
     const leadsA = leadsByVariant.find((v) => v.abVariant === 'A')?._count ?? 0;
     const leadsB = leadsByVariant.find((v) => v.abVariant === 'B')?._count ?? 0;
 

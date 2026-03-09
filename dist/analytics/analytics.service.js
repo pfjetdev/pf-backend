@@ -20,27 +20,24 @@ function _ts_metadata(k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 }
 let AnalyticsService = class AnalyticsService {
-    async trackVariantView(variant, page = 'search') {
+    async trackVariantView(variant, page = 'search', visitorId) {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
+        // One visitor = one view per page per day (duplicates ignored)
         await this.prisma.abVariantView.upsert({
             where: {
-                variant_page_date: {
-                    variant,
+                visitorId_page_date: {
+                    visitorId,
                     page,
                     date: today
                 }
             },
-            update: {
-                count: {
-                    increment: 1
-                }
-            },
+            update: {},
             create: {
                 variant,
                 page,
-                date: today,
-                count: 1
+                visitorId,
+                date: today
             }
         });
     }
