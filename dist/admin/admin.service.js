@@ -92,10 +92,18 @@ let AdminService = class AdminService {
         };
     }
     async getAbTestStats(page = 'search') {
-        const thirtyDaysAgo = new Date();
-        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-        // Filter leads by page context
-        const leadWhere = page === 'homepage' ? {
+        // Get test start date from settings
+        const startedAtKey = `${page}_ab_started_at`;
+        const startedAtSetting = await this.prisma.siteSetting.findUnique({
+            where: {
+                key: startedAtKey
+            }
+        });
+        const testStartedAt = startedAtSetting ? new Date(startedAtSetting.value) : null;
+        // Use test start date or fall back to 30 days ago
+        const sinceDate = testStartedAt ?? new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+        // Filter leads by page context + test start date
+        const leadPageFilter = page === 'homepage' ? {
             formLocation: {
                 startsWith: 'homepage'
             }
@@ -113,6 +121,12 @@ let AdminService = class AdminService {
                 }
             ]
         };
+        const leadWhere = {
+            ...leadPageFilter,
+            createdAt: {
+                gte: sinceDate
+            }
+        };
         const [leadsByVariant, leadsRaw, leadsByVariantStatus, viewsTotal, viewsRaw] = await Promise.all([
             this.prisma.lead.groupBy({
                 by: [
@@ -122,12 +136,7 @@ let AdminService = class AdminService {
                 _count: true
             }),
             this.prisma.lead.findMany({
-                where: {
-                    createdAt: {
-                        gte: thirtyDaysAgo
-                    },
-                    ...leadWhere
-                },
+                where: leadWhere,
                 select: {
                     createdAt: true,
                     abVariant: true
@@ -149,7 +158,10 @@ let AdminService = class AdminService {
                     'variant'
                 ],
                 where: {
-                    page
+                    page,
+                    createdAt: {
+                        gte: sinceDate
+                    }
                 },
                 _count: true
             }),
@@ -160,18 +172,19 @@ let AdminService = class AdminService {
                 ],
                 where: {
                     date: {
-                        gte: thirtyDaysAgo
+                        gte: sinceDate
                     },
                     page
                 },
                 _count: true
             })
         ]);
-        // Build per-day breakdown (leads + views)
+        // Build per-day breakdown (leads + views) from test start date
         const dayCounts = {};
-        for(let i = 0; i < 30; i++){
+        const dayCount = Math.min(Math.ceil((Date.now() - sinceDate.getTime()) / (24 * 60 * 60 * 1000)) + 1, 90);
+        for(let i = 0; i < dayCount; i++){
             const d = new Date();
-            d.setDate(d.getDate() - (29 - i));
+            d.setDate(d.getDate() - (dayCount - 1 - i));
             dayCounts[d.toISOString().slice(0, 10)] = {
                 variantA: 0,
                 variantB: 0,
