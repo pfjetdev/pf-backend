@@ -10,6 +10,7 @@ async function bootstrap() {
       'http://localhost:3000',
       'https://priorityflyers.com',
       'https://www.priorityflyers.com',
+      'https://pfbusiness.vercel.app',
     ],
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
     credentials: true,
