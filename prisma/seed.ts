@@ -1,6 +1,5 @@
 import { PrismaClient } from "../src/generated/prisma/client";
 import { PrismaNeon } from "@prisma/adapter-neon";
-import * as bcrypt from "bcryptjs";
 
 const adapter = new PrismaNeon({
   connectionString: process.env.DIRECT_URL!,
@@ -10,32 +9,7 @@ const prisma = new PrismaClient({ adapter });
 async function main() {
   console.log("Seeding database...");
 
-  // 1. Agents
-  const adminHash = await bcrypt.hash("admin123", 10);
-
-  const agent1 = await prisma.agent.create({
-    data: {
-      name: "Alex Priority",
-      email: "alex@priorityflyers.com",
-      phone: "+1-800-555-0001",
-      passwordHash: adminHash,
-      role: "admin",
-      isActive: true,
-    },
-  });
-
-  const agent2 = await prisma.agent.create({
-    data: {
-      name: "Sarah Travel",
-      email: "sarah@priorityflyers.com",
-      phone: "+1-800-555-0002",
-      passwordHash: adminHash,
-      role: "agent",
-      isActive: true,
-    },
-  });
-
-  console.log(`✓ Agents: ${agent1.name}, ${agent2.name}`);
+  // Admin is created via POST /auth/setup (one-time endpoint)
 
   // 2. Deals — 168 routes covering all destinations
   type DealRow = { slug: string; origin: string; originCode: string; destination: string; destinationCode: string; countryCode: string; cabinClass: string; publicFare: number; pfPrice: number; imageUrl: string; themeColor: string; sortOrder: number };
@@ -546,7 +520,7 @@ async function main() {
     { city: "Cartagena", country: "Colombia", countryCode: "CO", airportCode: "CTG", imageUrl: "https://images.unsplash.com/photo-1583531172005-814532673540?w=400&h=300&fit=crop", fromPrice: 2299, region: "americas", sortOrder: 13 },
   ];
 
-  await prisma.destination.createMany({ data: destinationsData });
+  await prisma.destination.createMany({ data: destinationsData, skipDuplicates: true });
   console.log(`✓ Destinations: ${destinationsData.length}`);
 
   // 4. Airlines
@@ -563,7 +537,7 @@ async function main() {
     { name: "Hainan Airlines", slug: "hainan-airlines", iataCode: "HU", alliance: null, hubCity: "Beijing", routeCodes: ["PEK"], description: "Hainan Airlines is China's only Skytrax 5-Star airline, offering exceptional Business Class with reverse herringbone lie-flat seats, premium Chinese and Western cuisine, and competitive pricing on transpacific routes.", logoUrl: "/airlines/Hainan Airlines.svg", imageUrl: "https://images.unsplash.com/photo-1547981609-4b6bfe67ca0b?w=600&q=80", featuredRoute: "Beijing · Business Class", savingPercent: 45, sortOrder: 9 },
   ];
 
-  await prisma.airline.createMany({ data: airlinesData });
+  await prisma.airline.createMany({ data: airlinesData, skipDuplicates: true });
   console.log(`✓ Airlines: ${airlinesData.length}`);
 
   // 5. Blog Posts
@@ -837,7 +811,7 @@ async function main() {
     },
   ];
 
-  await prisma.blogPost.createMany({ data: blogPostsData });
+  await prisma.blogPost.createMany({ data: blogPostsData, skipDuplicates: true });
   console.log(`✓ Blog Posts: ${blogPostsData.length}`);
 
   // 6. Testimonials
@@ -850,11 +824,11 @@ async function main() {
     { name: "Isabella Romano", role: "Fashion Designer", location: "Milan, Italy", rating: 5, text: "The personal touch is what sets them apart. My consultant remembers my preferences and always finds the best options.", sortOrder: 5 },
   ];
 
-  await prisma.testimonial.createMany({ data: testimonialsData });
+  await prisma.testimonial.createMany({ data: testimonialsData, skipDuplicates: true });
   console.log(`✓ Testimonials: ${testimonialsData.length}`);
 
   // 7. Site Settings
-  await prisma.siteSetting.createMany({
+  await prisma.siteSetting.createMany({ skipDuplicates: true,
     data: [
       { key: "ab_test_enabled", value: "true" },
       { key: "ab_default_variant", value: "A" },

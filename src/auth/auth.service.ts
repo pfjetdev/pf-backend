@@ -39,6 +39,52 @@ export class AuthService {
     };
   }
 
+  async setup(email: string, password: string, name: string) {
+    const adminCount = await this.prisma.agent.count({ where: { role: 'admin' } });
+    if (adminCount > 0) {
+      throw new UnauthorizedException('Admin already exists. Use /auth/login');
+    }
+
+    if (password.length < 8) {
+      throw new UnauthorizedException('Password must be at least 8 characters');
+    }
+
+    const hash = await bcrypt.hash(password, 12);
+    const agent = await this.prisma.agent.create({
+      data: { email, name, passwordHash: hash, role: 'admin', isActive: true },
+    });
+
+    const payload = { sub: agent.id, email: agent.email, role: agent.role };
+    return {
+      access_token: this.jwtService.sign(payload),
+      user: { id: agent.id, name: agent.name, email: agent.email, role: agent.role },
+    };
+  }
+
+  async changePassword(userId: string, currentPassword: string, newPassword: string) {
+    const agent = await this.prisma.agent.findUnique({ where: { id: userId } });
+    if (!agent || !agent.passwordHash) {
+      throw new UnauthorizedException();
+    }
+
+    const valid = await bcrypt.compare(currentPassword, agent.passwordHash);
+    if (!valid) {
+      throw new UnauthorizedException('Current password is incorrect');
+    }
+
+    if (newPassword.length < 8) {
+      throw new UnauthorizedException('New password must be at least 8 characters');
+    }
+
+    const hash = await bcrypt.hash(newPassword, 12);
+    await this.prisma.agent.update({
+      where: { id: userId },
+      data: { passwordHash: hash },
+    });
+
+    return { message: 'Password changed successfully' };
+  }
+
   async getProfile(userId: string) {
     const agent = await this.prisma.agent.findUnique({
       where: { id: userId },
