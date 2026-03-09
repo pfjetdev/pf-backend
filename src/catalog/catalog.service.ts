@@ -34,7 +34,7 @@ export class CatalogService {
     const groups: RegionGroup[] = [];
 
     for (const slug of REGION_SLUGS) {
-      const regionDests = destinations.filter((d) => DISPLAY_TO_SLUG[d.region] === slug);
+      const regionDests = destinations.filter((d) => this.matchRegion(d.region, slug));
       if (regionDests.length === 0) continue;
 
       const countries = this.groupByCountry(regionDests, deals);
@@ -77,7 +77,7 @@ export class CatalogService {
 
     const destinations = this.mapDestinations(rawDests);
     const deals = this.mapDeals(rawDeals);
-    const regionDests = destinations.filter((d) => DISPLAY_TO_SLUG[d.region] === region);
+    const regionDests = destinations.filter((d) => this.matchRegion(d.region, region));
     if (regionDests.length === 0) throw new NotFoundException('Region has no destinations');
 
     const countryGroups = this.groupByCountry(regionDests, deals);
@@ -125,7 +125,7 @@ export class CatalogService {
 
     const destinations = this.mapDestinations(rawDests);
     const deals = this.mapDeals(rawDeals);
-    const regionDests = destinations.filter((d) => DISPLAY_TO_SLUG[d.region] === region);
+    const regionDests = destinations.filter((d) => this.matchRegion(d.region, region));
     const countryName = this.findCountryBySlug(countrySlug, regionDests);
     if (!countryName) throw new NotFoundException('Country not found');
 
@@ -187,7 +187,7 @@ export class CatalogService {
     const destinations = this.mapDestinations(rawDests);
 
     const dest = destinations.find((d) => d.airportCode === deal.destinationCode);
-    const regionSlug = dest ? DISPLAY_TO_SLUG[dest.region] : undefined;
+    const regionSlug = dest ? (DISPLAY_TO_SLUG[dest.region] || dest.region) : undefined;
     const countrySlug = dest ? this.toCountrySlug(dest.country) : undefined;
 
     const otherDeals = allDeals.filter((d) => d.slug !== deal.slug).slice(0, 5);
@@ -318,6 +318,11 @@ export class CatalogService {
   }
 
   // ── Private helpers ──
+
+  /** Match region field (could be slug "europe" or display name "Europe") against a slug */
+  private matchRegion(regionField: string, slug: string): boolean {
+    return regionField === slug || DISPLAY_TO_SLUG[regionField] === slug;
+  }
 
   private isValidRegion(slug: string): boolean {
     return (REGION_SLUGS as readonly string[]).includes(slug);
