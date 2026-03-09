@@ -11,7 +11,8 @@ async function bootstrap() {
         origin: [
             'http://localhost:3000',
             'https://priorityflyers.com',
-            'https://www.priorityflyers.com'
+            'https://www.priorityflyers.com',
+            'https://pfbusiness.vercel.app'
         ],
         methods: [
             'GET',

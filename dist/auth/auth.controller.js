@@ -12,6 +12,8 @@ const _common = require("@nestjs/common");
 const _authservice = require("./auth.service");
 const _jwtauthguard = require("./jwt-auth.guard");
 const _logindto = require("./dto/login.dto");
+const _setupdto = require("./dto/setup.dto");
+const _changepassworddto = require("./dto/change-password.dto");
 function _ts_decorate(decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -27,8 +29,14 @@ function _ts_param(paramIndex, decorator) {
     };
 }
 let AuthController = class AuthController {
+    async setup(dto) {
+        return this.authService.setup(dto.email, dto.password, dto.name);
+    }
     async login(dto) {
         return this.authService.login(dto.email, dto.password);
+    }
+    async changePassword(req, dto) {
+        return this.authService.changePassword(req.user.id, dto.currentPassword, dto.newPassword);
     }
     async getProfile(req) {
         return this.authService.getProfile(req.user.id);
@@ -38,6 +46,15 @@ let AuthController = class AuthController {
     }
 };
 _ts_decorate([
+    (0, _common.Post)('setup'),
+    _ts_param(0, (0, _common.Body)()),
+    _ts_metadata("design:type", Function),
+    _ts_metadata("design:paramtypes", [
+        typeof _setupdto.SetupDto === "undefined" ? Object : _setupdto.SetupDto
+    ]),
+    _ts_metadata("design:returntype", Promise)
+], AuthController.prototype, "setup", null);
+_ts_decorate([
     (0, _common.Post)('login'),
     _ts_param(0, (0, _common.Body)()),
     _ts_metadata("design:type", Function),
@@ -46,6 +63,18 @@ _ts_decorate([
     ]),
     _ts_metadata("design:returntype", Promise)
 ], AuthController.prototype, "login", null);
+_ts_decorate([
+    (0, _common.UseGuards)(_jwtauthguard.JwtAuthGuard),
+    (0, _common.Patch)('change-password'),
+    _ts_param(0, (0, _common.Request)()),
+    _ts_param(1, (0, _common.Body)()),
+    _ts_metadata("design:type", Function),
+    _ts_metadata("design:paramtypes", [
+        Object,
+        typeof _changepassworddto.ChangePasswordDto === "undefined" ? Object : _changepassworddto.ChangePasswordDto
+    ]),
+    _ts_metadata("design:returntype", Promise)
+], AuthController.prototype, "changePassword", null);
 _ts_decorate([
     (0, _common.UseGuards)(_jwtauthguard.JwtAuthGuard),
     (0, _common.Get)('me'),

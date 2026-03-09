@@ -1,0 +1,1 @@
+{"version":3,"sources":["../../../src/auth/dto/setup.dto.ts"],"sourcesContent":["export class SetupDto {\n  email!: string;\n  password!: string;\n  name!: string;\n}\n"],"names":["SetupDto"],"mappings":";;;;+BAAaA;;;eAAAA;;;AAAN,IAAA,AAAMA,WAAN,MAAMA;AAIb"}

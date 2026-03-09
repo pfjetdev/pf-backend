@@ -98,6 +98,72 @@ let AuthService = class AuthService {
             }
         };
     }
+    async setup(email, password, name) {
+        const adminCount = await this.prisma.agent.count({
+            where: {
+                role: 'admin'
+            }
+        });
+        if (adminCount > 0) {
+            throw new _common.UnauthorizedException('Admin already exists. Use /auth/login');
+        }
+        if (password.length < 8) {
+            throw new _common.UnauthorizedException('Password must be at least 8 characters');
+        }
+        const hash = await _bcryptjs.hash(password, 12);
+        const agent = await this.prisma.agent.create({
+            data: {
+                email,
+                name,
+                passwordHash: hash,
+                role: 'admin',
+                isActive: true
+            }
+        });
+        const payload = {
+            sub: agent.id,
+            email: agent.email,
+            role: agent.role
+        };
+        return {
+            access_token: this.jwtService.sign(payload),
+            user: {
+                id: agent.id,
+                name: agent.name,
+                email: agent.email,
+                role: agent.role
+            }
+        };
+    }
+    async changePassword(userId, currentPassword, newPassword) {
+        const agent = await this.prisma.agent.findUnique({
+            where: {
+                id: userId
+            }
+        });
+        if (!agent || !agent.passwordHash) {
+            throw new _common.UnauthorizedException();
+        }
+        const valid = await _bcryptjs.compare(currentPassword, agent.passwordHash);
+        if (!valid) {
+            throw new _common.UnauthorizedException('Current password is incorrect');
+        }
+        if (newPassword.length < 8) {
+            throw new _common.UnauthorizedException('New password must be at least 8 characters');
+        }
+        const hash = await _bcryptjs.hash(newPassword, 12);
+        await this.prisma.agent.update({
+            where: {
+                id: userId
+            },
+            data: {
+                passwordHash: hash
+            }
+        });
+        return {
+            message: 'Password changed successfully'
+        };
+    }
     async getProfile(userId) {
         const agent = await this.prisma.agent.findUnique({
             where: {

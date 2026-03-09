@@ -867,7 +867,6 @@ async function main() {
       { key: "flight_seats_business", value: "2,5" },
       { key: "flight_seats_first", value: "1,3" },
     ],
-    skipDuplicates: true,
   });
   console.log(`✓ Site Settings: 31`);
 
