@@ -11,6 +11,13 @@ Object.defineProperty(exports, "PrismaService", {
 const _common = require("@nestjs/common");
 const _client = require("../generated/prisma/client");
 const _adapterneon = require("@prisma/adapter-neon");
+const _serverless = require("@neondatabase/serverless");
+const _ws = /*#__PURE__*/ _interop_require_default(require("ws"));
+function _interop_require_default(obj) {
+    return obj && obj.__esModule ? obj : {
+        default: obj
+    };
+}
 function _ts_decorate(decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -20,17 +27,27 @@ function _ts_decorate(decorators, target, key, desc) {
 function _ts_metadata(k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 }
+// Node.js не имеет нативного WebSocket — нужен ws
+_serverless.neonConfig.webSocketConstructor = _ws.default;
 let PrismaService = class PrismaService extends _client.PrismaClient {
+    async onModuleInit() {
+        await this.$connect();
+        this.logger.log('Database connected');
+    }
     async onModuleDestroy() {
         await this.$disconnect();
     }
     constructor(){
+        const connectionString = process.env.DATABASE_URL;
+        if (!connectionString) {
+            throw new Error('DATABASE_URL is not set');
+        }
         const adapter = new _adapterneon.PrismaNeon({
-            connectionString: process.env.DATABASE_URL
+            connectionString
         });
         super({
             adapter
-        });
+        }), this.logger = new _common.Logger(PrismaService.name);
     }
 };
 PrismaService = _ts_decorate([

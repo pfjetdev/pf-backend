@@ -20,16 +20,24 @@ RUN npx nest build
 
 # ── Stage 3: production image ──
 FROM node:20-alpine AS runtime
+RUN apk add --no-cache dumb-init \
+ && addgroup -S app && adduser -S app -G app
 WORKDIR /app
 
 ENV NODE_ENV=production
 
-# Only copy what we need to run
-COPY --from=deps /app/node_modules ./node_modules
-COPY --from=deps /app/src/generated ./src/generated
-COPY --from=build /app/dist ./dist
+COPY --from=deps  /app/node_modules  ./node_modules
+COPY --from=deps  /app/src/generated ./src/generated
+COPY --from=build /app/dist          ./dist
 COPY package.json ./
+
+RUN chown -R app:app /app
+USER app
 
 EXPOSE 3001
 
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+  CMD ["node", "-e", "fetch('http://localhost:3001/health').then(r=>{if(!r.ok)throw r})"]
+
+ENTRYPOINT ["dumb-init", "--"]
 CMD ["node", "dist/main"]

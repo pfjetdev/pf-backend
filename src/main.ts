@@ -1,17 +1,29 @@
 import 'dotenv/config';
 import { NestFactory } from '@nestjs/core';
-import { ValidationPipe } from '@nestjs/common';
+import { Logger, ValidationPipe } from '@nestjs/common';
+import helmet from 'helmet';
 import { AppModule } from './app.module';
 import { AuditInterceptor } from './common/interceptors/audit.interceptor';
 
+const REQUIRED_ENV = ['DATABASE_URL', 'JWT_SECRET'] as const;
+
 async function bootstrap() {
+  const missing = REQUIRED_ENV.filter((k) => !process.env[k]);
+  if (missing.length) {
+    throw new Error(`Missing env vars: ${missing.join(', ')}`);
+  }
+
   const app = await NestFactory.create(AppModule);
 
-  app.useGlobalPipes(new ValidationPipe({
-    whitelist: true,
-    forbidNonWhitelisted: true,
-    transform: true,
-  }));
+  app.use(helmet());
+
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    }),
+  );
 
   app.useGlobalInterceptors(new AuditInterceptor());
 
@@ -28,8 +40,10 @@ async function bootstrap() {
     credentials: true,
   });
 
+  app.enableShutdownHooks();
+
   const port = process.env.PORT ?? 3001;
   await app.listen(port);
-  console.log(`🚀 API running on http://localhost:${port}`);
+  Logger.log(`API running on :${port}`, 'Bootstrap');
 }
 bootstrap();

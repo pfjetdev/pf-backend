@@ -12,6 +12,7 @@ const _common = require("@nestjs/common");
 const _core = require("@nestjs/core");
 const _throttler = require("@nestjs/throttler");
 const _originguard = require("./common/guards/origin.guard");
+const _healthcontroller = require("./health.controller");
 const _prismamodule = require("./prisma/prisma.module");
 const _authmodule = require("./auth/auth.module");
 const _adminmodule = require("./admin/admin.module");
@@ -72,6 +73,9 @@ AppModule = _ts_decorate([
             _testimonialsmodule.TestimonialsModule,
             _beatmypricemodule.BeatMyPriceModule,
             _agentsmodule.AgentsModule
+        ],
+        controllers: [
+            _healthcontroller.HealthController
         ],
         providers: [
             {
