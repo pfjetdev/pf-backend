@@ -30,7 +30,13 @@ let FlightsService = class FlightsService {
         ]);
         const config = parseFlightConfig(settings);
         const flights = (0, _generateflights.generateFlightResults)(params, airlines, config);
-        const tierPricing = flights.length > 0 ? await this.tierPricing.compute(flights[0].price, params.cabin) : undefined;
+        // Always derive tier pricing from a business-class baseline so the
+        // three-tab prices stay identical regardless of the searched cabin.
+        const bizFlights = params.cabin === 'business' ? flights : (0, _generateflights.generateFlightResults)({
+            ...params,
+            cabin: 'business'
+        }, airlines, config);
+        const tierPricing = bizFlights.length > 0 ? await this.tierPricing.compute(bizFlights[0].price, 'business') : undefined;
         return {
             flights,
             tierPricing
