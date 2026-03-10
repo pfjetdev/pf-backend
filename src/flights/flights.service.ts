@@ -1,23 +1,30 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { SettingsService } from '../settings/settings.service';
+import { TierPricingService } from './tier-pricing.service';
 import { generateFlightResults, getAirlineLogo } from './generate-flights';
-import type { SearchParams, FlightResult, FlightGeneratorConfig, AirlineInfo } from './flights.types';
+import type { SearchParams, FlightResult, FlightGeneratorConfig, AirlineInfo, FlightSearchResponse } from './flights.types';
 
 @Injectable()
 export class FlightsService {
   constructor(
     private prisma: PrismaService,
     private settings: SettingsService,
+    private tierPricing: TierPricingService,
   ) {}
 
-  /** Generate flight results for a search query */
-  async search(params: SearchParams): Promise<FlightResult[]> {
-    const [airlines, config] = await Promise.all([
+  /** Generate flight results + tier pricing for a search query */
+  async search(params: SearchParams): Promise<FlightSearchResponse> {
+    const [airlines, settings] = await Promise.all([
       this.getAirlines(),
-      this.getFlightConfig(),
+      this.settings.getAll(),
     ]);
-    return generateFlightResults(params, airlines, config);
+    const config = parseFlightConfig(settings);
+    const flights = generateFlightResults(params, airlines, config);
+    const tierPricing = flights.length > 0
+      ? await this.tierPricing.compute(flights[0].price, params.cabin)
+      : undefined;
+    return { flights, tierPricing };
   }
 
   /** Reconstruct a single flight from a lead source string (e.g. "flight:fl-NYC-LON-...") */
@@ -66,7 +73,8 @@ export class FlightsService {
       type: returnDate ? 'round' : 'oneway',
     };
 
-    const config = await this.getFlightConfig();
+    const settings = await this.settings.getAll();
+    const config = parseFlightConfig(settings);
     const flights = generateFlightResults(params, [], config);
     const seed = `${from}-${to}-${depart}-${returnDate || ''}-${cabin}`;
     const flightId = `fl-${seed}-${index}`;
@@ -87,12 +95,6 @@ export class FlightsService {
       logo: a.logoUrl || getAirlineLogo(a.name),
       routeCodes: a.routeCodes ?? [],
     }));
-  }
-
-  /** Parse flight config from site settings */
-  private async getFlightConfig(): Promise<Partial<FlightGeneratorConfig>> {
-    const settings = await this.settings.getAll();
-    return parseFlightConfig(settings);
   }
 }
 

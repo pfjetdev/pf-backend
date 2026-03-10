@@ -49,8 +49,7 @@ export class FlightsController {
       legs,
     };
 
-    const flights = await this.flights.search(params);
-    return { flights };
+    return this.flights.search(params);
   }
 
   /** Public: reconstruct a flight from a lead source string */

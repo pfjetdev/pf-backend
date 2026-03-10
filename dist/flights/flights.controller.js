@@ -62,10 +62,7 @@ let FlightsController = class FlightsController {
             ].includes(type || '') ? type : returnDate ? 'round' : 'oneway',
             legs
         };
-        const flights = await this.flights.search(params);
-        return {
-            flights
-        };
+        return this.flights.search(params);
     }
     /** Public: reconstruct a flight from a lead source string */ async reconstruct(source) {
         const result = await this.flights.reconstructFromSource(source);

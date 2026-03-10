@@ -56,6 +56,24 @@ export interface FlightResult {
   fareClass?: string;
 }
 
+/** Pre-computed tier prices for Variant B */
+export interface TierPrice {
+  price: number;
+  originalPrice: number;
+}
+
+export interface TierPricing {
+  premium: TierPrice;
+  business: TierPrice;
+  first: TierPrice;
+}
+
+/** Search response returned by the API */
+export interface FlightSearchResponse {
+  flights: FlightResult[];
+  tierPricing?: TierPricing;
+}
+
 /** Config object (connected to DB via SiteSetting) */
 export interface FlightGeneratorConfig {
   resultCount: number;

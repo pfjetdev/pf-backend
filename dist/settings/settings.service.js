@@ -19,22 +19,24 @@ function _ts_decorate(decorators, target, key, desc) {
 function _ts_metadata(k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 }
+const CACHE_TTL_MS = 30_000; // 30 seconds
 let SettingsService = class SettingsService {
     async getAll() {
+        if (this.cache && Date.now() < this.cacheExpiry) {
+            return this.cache;
+        }
         const rows = await this.prisma.siteSetting.findMany();
         const result = {};
         for (const row of rows){
             result[row.key] = row.value;
         }
+        this.cache = result;
+        this.cacheExpiry = Date.now() + CACHE_TTL_MS;
         return result;
     }
     async get(key) {
-        const row = await this.prisma.siteSetting.findUnique({
-            where: {
-                key
-            }
-        });
-        return row?.value ?? null;
+        const all = await this.getAll();
+        return all[key] ?? null;
     }
     async set(key, value) {
         const row = await this.prisma.siteSetting.upsert({
@@ -49,13 +51,20 @@ let SettingsService = class SettingsService {
                 value
             }
         });
+        this.invalidateCache();
         return {
             key: row.key,
             value: row.value
         };
     }
+    /** Clear cache so next getAll() re-fetches from DB */ invalidateCache() {
+        this.cache = null;
+        this.cacheExpiry = 0;
+    }
     constructor(prisma){
         this.prisma = prisma;
+        this.cache = null;
+        this.cacheExpiry = 0;
     }
 };
 SettingsService = _ts_decorate([

@@ -11,6 +11,7 @@ Object.defineProperty(exports, "FlightsService", {
 const _common = require("@nestjs/common");
 const _prismaservice = require("../prisma/prisma.service");
 const _settingsservice = require("../settings/settings.service");
+const _tierpricingservice = require("./tier-pricing.service");
 const _generateflights = require("./generate-flights");
 function _ts_decorate(decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -22,12 +23,18 @@ function _ts_metadata(k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 }
 let FlightsService = class FlightsService {
-    /** Generate flight results for a search query */ async search(params) {
-        const [airlines, config] = await Promise.all([
+    /** Generate flight results + tier pricing for a search query */ async search(params) {
+        const [airlines, settings] = await Promise.all([
             this.getAirlines(),
-            this.getFlightConfig()
+            this.settings.getAll()
         ]);
-        return (0, _generateflights.generateFlightResults)(params, airlines, config);
+        const config = parseFlightConfig(settings);
+        const flights = (0, _generateflights.generateFlightResults)(params, airlines, config);
+        const tierPricing = flights.length > 0 ? await this.tierPricing.compute(flights[0].price, params.cabin) : undefined;
+        return {
+            flights,
+            tierPricing
+        };
     }
     /** Reconstruct a single flight from a lead source string (e.g. "flight:fl-NYC-LON-...") */ async reconstructFromSource(source) {
         if (!source.startsWith('flight:fl-')) return null;
@@ -63,7 +70,8 @@ let FlightsService = class FlightsService {
             pets: 0,
             type: returnDate ? 'round' : 'oneway'
         };
-        const config = await this.getFlightConfig();
+        const settings = await this.settings.getAll();
+        const config = parseFlightConfig(settings);
         const flights = (0, _generateflights.generateFlightResults)(params, [], config);
         const seed = `${from}-${to}-${depart}-${returnDate || ''}-${cabin}`;
         const flightId = `fl-${seed}-${index}`;
@@ -89,13 +97,10 @@ let FlightsService = class FlightsService {
                 routeCodes: a.routeCodes ?? []
             }));
     }
-    /** Parse flight config from site settings */ async getFlightConfig() {
-        const settings = await this.settings.getAll();
-        return parseFlightConfig(settings);
-    }
-    constructor(prisma, settings){
+    constructor(prisma, settings, tierPricing){
         this.prisma = prisma;
         this.settings = settings;
+        this.tierPricing = tierPricing;
     }
 };
 FlightsService = _ts_decorate([
@@ -103,7 +108,8 @@ FlightsService = _ts_decorate([
     _ts_metadata("design:type", Function),
     _ts_metadata("design:paramtypes", [
         typeof _prismaservice.PrismaService === "undefined" ? Object : _prismaservice.PrismaService,
-        typeof _settingsservice.SettingsService === "undefined" ? Object : _settingsservice.SettingsService
+        typeof _settingsservice.SettingsService === "undefined" ? Object : _settingsservice.SettingsService,
+        typeof _tierpricingservice.TierPricingService === "undefined" ? Object : _tierpricingservice.TierPricingService
     ])
 ], FlightsService);
 /** Parse SiteSetting key-value pairs into FlightGeneratorConfig */ function parseFlightConfig(settings) {

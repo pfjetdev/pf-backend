@@ -11,6 +11,7 @@ Object.defineProperty(exports, "FlightsModule", {
 const _common = require("@nestjs/common");
 const _flightscontroller = require("./flights.controller");
 const _flightsservice = require("./flights.service");
+const _tierpricingservice = require("./tier-pricing.service");
 const _settingsmodule = require("../settings/settings.module");
 function _ts_decorate(decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -29,7 +30,8 @@ FlightsModule = _ts_decorate([
             _flightscontroller.FlightsController
         ],
         providers: [
-            _flightsservice.FlightsService
+            _flightsservice.FlightsService,
+            _tierpricingservice.TierPricingService
         ],
         exports: [
             _flightsservice.FlightsService
