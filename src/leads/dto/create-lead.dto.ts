@@ -57,6 +57,12 @@ export class CreateLeadDto {
   passengersInfants?: number;
 
   @IsOptional()
+  @IsInt()
+  @Min(0)
+  @Max(9)
+  passengersPets?: number;
+
+  @IsOptional()
   @IsNumber()
   @Min(0)
   quotedPrice?: number;

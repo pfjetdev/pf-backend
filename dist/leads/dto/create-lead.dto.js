@@ -89,6 +89,13 @@ _ts_decorate([
 ], CreateLeadDto.prototype, "passengersInfants", void 0);
 _ts_decorate([
     (0, _classvalidator.IsOptional)(),
+    (0, _classvalidator.IsInt)(),
+    (0, _classvalidator.Min)(0),
+    (0, _classvalidator.Max)(9),
+    _ts_metadata("design:type", Number)
+], CreateLeadDto.prototype, "passengersPets", void 0);
+_ts_decorate([
+    (0, _classvalidator.IsOptional)(),
     (0, _classvalidator.IsNumber)(),
     (0, _classvalidator.Min)(0),
     _ts_metadata("design:type", Number)
