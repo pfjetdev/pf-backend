@@ -3,6 +3,9 @@ import { PrismaService } from '../prisma/prisma.service';
 import { EventsService } from '../events/events.service';
 import { CreateBeatMyPriceDto } from './dto/create-beat-my-price.dto';
 import { UpdateBeatMyPriceDto } from './dto/update-beat-my-price.dto';
+import { parsePagination, paginatedResult } from '../common/utils/pagination';
+import { buildCsv } from '../common/utils/csv';
+import { buildDateRange } from '../common/utils/query';
 
 interface FindAllQuery {
   page?: number;
@@ -15,6 +18,8 @@ interface FindAllQuery {
   dateTo?: string;
   agentId?: string;
 }
+
+const AGENT_SELECT = { select: { id: true, name: true } } as const;
 
 @Injectable()
 export class BeatMyPriceService {
@@ -60,16 +65,10 @@ export class BeatMyPriceService {
         { phone: { contains: query.search } },
       ];
     }
-    if (query?.dateFrom || query?.dateTo) {
-      const createdAt: Record<string, Date> = {};
-      if (query?.dateFrom) createdAt.gte = new Date(query.dateFrom);
-      if (query?.dateTo) {
-        const end = new Date(query.dateTo);
-        end.setDate(end.getDate() + 1);
-        createdAt.lte = end;
-      }
-      where.createdAt = createdAt;
-    }
+
+    const dateRange = buildDateRange(query?.dateFrom, query?.dateTo);
+    if (dateRange) where.createdAt = dateRange;
+
     if (query?.agentId) {
       where.agentId = query.agentId === 'unassigned' ? null : query.agentId;
     }
@@ -78,14 +77,8 @@ export class BeatMyPriceService {
   }
 
   async findAll(query?: FindAllQuery) {
-    const page = query?.page || 1;
-    const limit = query?.limit || 25;
-    const skip = (page - 1) * limit;
+    const { page, limit, skip, orderBy } = parsePagination(query);
     const where = this.buildWhereClause(query);
-
-    const orderBy: Record<string, string> = {};
-    const sortBy = query?.sortBy || 'createdAt';
-    orderBy[sortBy] = query?.sortOrder || 'desc';
 
     const [data, total] = await Promise.all([
       this.prisma.beatMyPriceRequest.findMany({
@@ -93,18 +86,18 @@ export class BeatMyPriceService {
         orderBy,
         skip,
         take: limit,
-        include: { agent: { select: { id: true, name: true } } },
+        include: { agent: AGENT_SELECT },
       }),
       this.prisma.beatMyPriceRequest.count({ where }),
     ]);
 
-    return { data, total, page, limit, totalPages: Math.ceil(total / limit) };
+    return paginatedResult(data, total, page, limit);
   }
 
   async findOne(id: string) {
     const item = await this.prisma.beatMyPriceRequest.findUnique({
       where: { id },
-      include: { agent: { select: { id: true, name: true } } },
+      include: { agent: AGENT_SELECT },
     });
     if (!item) throw new NotFoundException('Request not found');
     return item;
@@ -120,7 +113,7 @@ export class BeatMyPriceService {
         agentId: dto.agentId,
         agentNotes: dto.agentNotes,
       },
-      include: { agent: { select: { id: true, name: true } } },
+      include: { agent: AGENT_SELECT },
     });
   }
 
@@ -154,28 +147,19 @@ export class BeatMyPriceService {
 
   async exportCsv(query?: FindAllQuery): Promise<string> {
     const where = this.buildWhereClause(query);
-    const orderBy: Record<string, string> = {};
-    orderBy[query?.sortBy || 'createdAt'] = query?.sortOrder || 'desc';
+    const { orderBy } = parsePagination(query);
 
     const items = await this.prisma.beatMyPriceRequest.findMany({
       where,
       orderBy,
-      include: { agent: { select: { id: true, name: true } } },
+      include: { agent: AGENT_SELECT },
     });
 
-    const headers = [
-      'ID', 'Email', 'Phone', 'Origin', 'Destination',
-      'Competitor Price', 'Competitor URL', 'Our Price',
-      'Status', 'Agent', 'Screenshot', 'Created At',
-    ];
-
-    const escape = (val: string) =>
-      val.includes(',') || val.includes('"') || val.includes('\n')
-        ? `"${val.replace(/"/g, '""')}"`
-        : val;
-
-    const rows = items.map((item) =>
-      [
+    return buildCsv(
+      ['ID', 'Email', 'Phone', 'Origin', 'Destination',
+       'Competitor Price', 'Competitor URL', 'Our Price',
+       'Status', 'Agent', 'Screenshot', 'Created At'],
+      items.map((item) => [
         item.id,
         item.email,
         item.phone || '',
@@ -185,13 +169,11 @@ export class BeatMyPriceService {
         item.competitorUrl || '',
         item.ourPrice?.toString() || '',
         item.status,
-        (item as any).agent?.name || '',
+        (item as { agent?: { name: string } }).agent?.name || '',
         item.screenshotUrl || '',
         item.createdAt.toISOString(),
-      ].map(escape).join(','),
+      ]),
     );
-
-    return [headers.join(','), ...rows].join('\n');
   }
 
   // ── Bulk Operations ──

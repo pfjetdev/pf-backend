@@ -11,6 +11,9 @@ Object.defineProperty(exports, "BeatMyPriceService", {
 const _common = require("@nestjs/common");
 const _prismaservice = require("../prisma/prisma.service");
 const _eventsservice = require("../events/events.service");
+const _pagination = require("../common/utils/pagination");
+const _csv = require("../common/utils/csv");
+const _query = require("../common/utils/query");
 function _ts_decorate(decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -20,6 +23,12 @@ function _ts_decorate(decorators, target, key, desc) {
 function _ts_metadata(k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 }
+const AGENT_SELECT = {
+    select: {
+        id: true,
+        name: true
+    }
+};
 let BeatMyPriceService = class BeatMyPriceService {
     async create(dto) {
         const req = await this.prisma.beatMyPriceRequest.create({
@@ -73,29 +82,16 @@ let BeatMyPriceService = class BeatMyPriceService {
                 }
             ];
         }
-        if (query?.dateFrom || query?.dateTo) {
-            const createdAt = {};
-            if (query?.dateFrom) createdAt.gte = new Date(query.dateFrom);
-            if (query?.dateTo) {
-                const end = new Date(query.dateTo);
-                end.setDate(end.getDate() + 1);
-                createdAt.lte = end;
-            }
-            where.createdAt = createdAt;
-        }
+        const dateRange = (0, _query.buildDateRange)(query?.dateFrom, query?.dateTo);
+        if (dateRange) where.createdAt = dateRange;
         if (query?.agentId) {
             where.agentId = query.agentId === 'unassigned' ? null : query.agentId;
         }
         return where;
     }
     async findAll(query) {
-        const page = query?.page || 1;
-        const limit = query?.limit || 25;
-        const skip = (page - 1) * limit;
+        const { page, limit, skip, orderBy } = (0, _pagination.parsePagination)(query);
         const where = this.buildWhereClause(query);
-        const orderBy = {};
-        const sortBy = query?.sortBy || 'createdAt';
-        orderBy[sortBy] = query?.sortOrder || 'desc';
         const [data, total] = await Promise.all([
             this.prisma.beatMyPriceRequest.findMany({
                 where,
@@ -103,25 +99,14 @@ let BeatMyPriceService = class BeatMyPriceService {
                 skip,
                 take: limit,
                 include: {
-                    agent: {
-                        select: {
-                            id: true,
-                            name: true
-                        }
-                    }
+                    agent: AGENT_SELECT
                 }
             }),
             this.prisma.beatMyPriceRequest.count({
                 where
             })
         ]);
-        return {
-            data,
-            total,
-            page,
-            limit,
-            totalPages: Math.ceil(total / limit)
-        };
+        return (0, _pagination.paginatedResult)(data, total, page, limit);
     }
     async findOne(id) {
         const item = await this.prisma.beatMyPriceRequest.findUnique({
@@ -129,12 +114,7 @@ let BeatMyPriceService = class BeatMyPriceService {
                 id
             },
             include: {
-                agent: {
-                    select: {
-                        id: true,
-                        name: true
-                    }
-                }
+                agent: AGENT_SELECT
             }
         });
         if (!item) throw new _common.NotFoundException('Request not found');
@@ -153,12 +133,7 @@ let BeatMyPriceService = class BeatMyPriceService {
                 agentNotes: dto.agentNotes
             },
             include: {
-                agent: {
-                    select: {
-                        id: true,
-                        name: true
-                    }
-                }
+                agent: AGENT_SELECT
             }
         });
     }
@@ -204,21 +179,15 @@ let BeatMyPriceService = class BeatMyPriceService {
     // ── CSV Export ──
     async exportCsv(query) {
         const where = this.buildWhereClause(query);
-        const orderBy = {};
-        orderBy[query?.sortBy || 'createdAt'] = query?.sortOrder || 'desc';
+        const { orderBy } = (0, _pagination.parsePagination)(query);
         const items = await this.prisma.beatMyPriceRequest.findMany({
             where,
             orderBy,
             include: {
-                agent: {
-                    select: {
-                        id: true,
-                        name: true
-                    }
-                }
+                agent: AGENT_SELECT
             }
         });
-        const headers = [
+        return (0, _csv.buildCsv)([
             'ID',
             'Email',
             'Phone',
@@ -231,9 +200,7 @@ let BeatMyPriceService = class BeatMyPriceService {
             'Agent',
             'Screenshot',
             'Created At'
-        ];
-        const escape = (val)=>val.includes(',') || val.includes('"') || val.includes('\n') ? `"${val.replace(/"/g, '""')}"` : val;
-        const rows = items.map((item)=>[
+        ], items.map((item)=>[
                 item.id,
                 item.email,
                 item.phone || '',
@@ -246,11 +213,7 @@ let BeatMyPriceService = class BeatMyPriceService {
                 item.agent?.name || '',
                 item.screenshotUrl || '',
                 item.createdAt.toISOString()
-            ].map(escape).join(','));
-        return [
-            headers.join(','),
-            ...rows
-        ].join('\n');
+            ]));
     }
     // ── Bulk Operations ──
     async bulkUpdateStatus(ids, status) {

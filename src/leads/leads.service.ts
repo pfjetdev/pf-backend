@@ -3,6 +3,9 @@ import { PrismaService } from '../prisma/prisma.service';
 import { EventsService } from '../events/events.service';
 import { CreateLeadDto } from './dto/create-lead.dto';
 import { UpdateLeadDto } from './dto/update-lead.dto';
+import { parsePagination, paginatedResult } from '../common/utils/pagination';
+import { buildCsv } from '../common/utils/csv';
+import { buildDateRange } from '../common/utils/query';
 
 interface FindAllQuery {
   page?: number;
@@ -17,6 +20,8 @@ interface FindAllQuery {
   cabinClass?: string;
   agentId?: string;
 }
+
+const AGENT_SELECT = { select: { id: true, name: true } } as const;
 
 @Injectable()
 export class LeadsService {
@@ -77,16 +82,10 @@ export class LeadsService {
         { phone: { contains: query.search } },
       ];
     }
-    if (query?.dateFrom || query?.dateTo) {
-      const createdAt: Record<string, Date> = {};
-      if (query?.dateFrom) createdAt.gte = new Date(query.dateFrom);
-      if (query?.dateTo) {
-        const end = new Date(query.dateTo);
-        end.setDate(end.getDate() + 1);
-        createdAt.lte = end;
-      }
-      where.createdAt = createdAt;
-    }
+
+    const dateRange = buildDateRange(query?.dateFrom, query?.dateTo);
+    if (dateRange) where.createdAt = dateRange;
+
     if (query?.cabinClass) where.cabinClass = query.cabinClass;
     if (query?.agentId) {
       where.agentId = query.agentId === 'unassigned' ? null : query.agentId;
@@ -96,14 +95,8 @@ export class LeadsService {
   }
 
   async findAll(query?: FindAllQuery) {
-    const page = query?.page || 1;
-    const limit = query?.limit || 25;
-    const skip = (page - 1) * limit;
+    const { page, limit, skip, orderBy } = parsePagination(query);
     const where = this.buildWhereClause(query);
-
-    const orderBy: Record<string, string> = {};
-    const sortBy = query?.sortBy || 'createdAt';
-    orderBy[sortBy] = query?.sortOrder || 'desc';
 
     const [data, total] = await Promise.all([
       this.prisma.lead.findMany({
@@ -111,18 +104,12 @@ export class LeadsService {
         orderBy,
         skip,
         take: limit,
-        include: { agent: { select: { id: true, name: true } } },
+        include: { agent: AGENT_SELECT },
       }),
       this.prisma.lead.count({ where }),
     ]);
 
-    return {
-      data,
-      total,
-      page,
-      limit,
-      totalPages: Math.ceil(total / limit),
-    };
+    return paginatedResult(data, total, page, limit);
   }
 
   async findOne(id: string) {
@@ -144,7 +131,7 @@ export class LeadsService {
         agentNotes: dto.agentNotes,
         quotedPrice: dto.quotedPrice,
       },
-      include: { agent: { select: { id: true, name: true } } },
+      include: { agent: AGENT_SELECT },
     });
   }
 
@@ -176,28 +163,19 @@ export class LeadsService {
 
   async exportCsv(query?: FindAllQuery): Promise<string> {
     const where = this.buildWhereClause(query);
-    const orderBy: Record<string, string> = {};
-    orderBy[query?.sortBy || 'createdAt'] = query?.sortOrder || 'desc';
+    const { orderBy } = parsePagination(query);
 
     const leads = await this.prisma.lead.findMany({
       where,
       orderBy,
-      include: { agent: { select: { id: true, name: true } } },
+      include: { agent: AGENT_SELECT },
     });
 
-    const headers = [
-      'ID', 'Name', 'Email', 'Phone', 'Origin', 'Destination',
-      'Cabin Class', 'Status', 'Agent', 'Quoted Price', 'Source',
-      'A/B Variant', 'Created At',
-    ];
-
-    const escape = (val: string) =>
-      val.includes(',') || val.includes('"') || val.includes('\n')
-        ? `"${val.replace(/"/g, '""')}"`
-        : val;
-
-    const rows = leads.map((lead) =>
-      [
+    return buildCsv(
+      ['ID', 'Name', 'Email', 'Phone', 'Origin', 'Destination',
+       'Cabin Class', 'Status', 'Agent', 'Quoted Price', 'Source',
+       'A/B Variant', 'Created At'],
+      leads.map((lead) => [
         lead.id,
         lead.name,
         lead.email || '',
@@ -206,15 +184,13 @@ export class LeadsService {
         lead.destination || '',
         lead.cabinClass || '',
         lead.status,
-        (lead as any).agent?.name || '',
+        (lead as { agent?: { name: string } }).agent?.name || '',
         lead.quotedPrice?.toString() || '',
         lead.source || '',
         lead.abVariant || '',
         lead.createdAt.toISOString(),
-      ].map(escape).join(','),
+      ]),
     );
-
-    return [headers.join(','), ...rows].join('\n');
   }
 
   // ── Bulk Operations ──

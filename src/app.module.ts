@@ -1,4 +1,7 @@
 import { Module } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { OriginGuard } from './common/guards/origin.guard';
 import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
 import { AdminModule } from './admin/admin.module';
@@ -18,6 +21,11 @@ import { CatalogModule } from './catalog/catalog.module';
 
 @Module({
   imports: [
+    ThrottlerModule.forRoot([
+      { name: 'short', ttl: 1000, limit: 5 },
+      { name: 'medium', ttl: 10000, limit: 30 },
+      { name: 'long', ttl: 60000, limit: 120 },
+    ]),
     PrismaModule,
     AuthModule,
     AdminModule,
@@ -34,6 +42,10 @@ import { CatalogModule } from './catalog/catalog.module';
     TestimonialsModule,
     BeatMyPriceModule,
     AgentsModule,
+  ],
+  providers: [
+    { provide: APP_GUARD, useClass: ThrottlerGuard },
+    { provide: APP_GUARD, useClass: OriginGuard },
   ],
 })
 export class AppModule {}

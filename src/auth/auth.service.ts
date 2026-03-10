@@ -10,6 +10,21 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
+  private validatePasswordStrength(password: string) {
+    if (password.length < 8) {
+      throw new UnauthorizedException('Password must be at least 8 characters');
+    }
+    if (!/[a-z]/.test(password)) {
+      throw new UnauthorizedException('Password must contain a lowercase letter');
+    }
+    if (!/[A-Z]/.test(password)) {
+      throw new UnauthorizedException('Password must contain an uppercase letter');
+    }
+    if (!/\d/.test(password)) {
+      throw new UnauthorizedException('Password must contain a number');
+    }
+  }
+
   async validateUser(email: string, password: string) {
     const agent = await this.prisma.agent.findUnique({ where: { email } });
     if (!agent || !agent.passwordHash || !agent.isActive) {
@@ -49,9 +64,7 @@ export class AuthService {
       throw new UnauthorizedException('Admin already exists. Use /auth/login');
     }
 
-    if (password.length < 8) {
-      throw new UnauthorizedException('Password must be at least 8 characters');
-    }
+    this.validatePasswordStrength(password);
 
     const hash = await bcrypt.hash(password, 12);
     const agent = await this.prisma.agent.create({
@@ -76,9 +89,7 @@ export class AuthService {
       throw new UnauthorizedException('Current password is incorrect');
     }
 
-    if (newPassword.length < 8) {
-      throw new UnauthorizedException('New password must be at least 8 characters');
-    }
+    this.validatePasswordStrength(newPassword);
 
     const hash = await bcrypt.hash(newPassword, 12);
     await this.prisma.agent.update({

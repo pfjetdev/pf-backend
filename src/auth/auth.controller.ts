@@ -1,4 +1,5 @@
 import { Controller, Post, Get, Patch, Body, UseGuards, Request } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { LoginDto } from './dto/login.dto';
@@ -9,11 +10,13 @@ import { ChangePasswordDto } from './dto/change-password.dto';
 export class AuthController {
   constructor(private authService: AuthService) {}
 
+  @Throttle({ short: { ttl: 60000, limit: 3 } })
   @Post('setup')
   async setup(@Body() dto: SetupDto) {
     return this.authService.setup(dto.email, dto.password, dto.name);
   }
 
+  @Throttle({ short: { ttl: 60000, limit: 5 } })
   @Post('login')
   async login(@Body() dto: LoginDto) {
     return this.authService.login(dto.email, dto.password);

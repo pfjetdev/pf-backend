@@ -1,17 +1,29 @@
 import 'dotenv/config';
 import { NestFactory } from '@nestjs/core';
+import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
+import { AuditInterceptor } from './common/interceptors/audit.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  app.useGlobalPipes(new ValidationPipe({
+    whitelist: true,
+    forbidNonWhitelisted: true,
+    transform: true,
+  }));
+
+  app.useGlobalInterceptors(new AuditInterceptor());
+
+  const isProduction = process.env.NODE_ENV === 'production';
   app.enableCors({
-    origin: [
-      'http://localhost:3000',
-      'https://priorityflyers.com',
-      'https://www.priorityflyers.com',
-      'https://pfbusiness.vercel.app',
-    ],
+    origin: isProduction
+      ? [
+          'https://priorityflyers.com',
+          'https://www.priorityflyers.com',
+          'https://pfbusiness.vercel.app',
+        ]
+      : ['http://localhost:3000'],
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
     credentials: true,
   });

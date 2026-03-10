@@ -9,6 +9,7 @@ Object.defineProperty(exports, "AuthController", {
     }
 });
 const _common = require("@nestjs/common");
+const _throttler = require("@nestjs/throttler");
 const _authservice = require("./auth.service");
 const _jwtauthguard = require("./jwt-auth.guard");
 const _logindto = require("./dto/login.dto");
@@ -46,6 +47,12 @@ let AuthController = class AuthController {
     }
 };
 _ts_decorate([
+    (0, _throttler.Throttle)({
+        short: {
+            ttl: 60000,
+            limit: 3
+        }
+    }),
     (0, _common.Post)('setup'),
     _ts_param(0, (0, _common.Body)()),
     _ts_metadata("design:type", Function),
@@ -55,6 +62,12 @@ _ts_decorate([
     _ts_metadata("design:returntype", Promise)
 ], AuthController.prototype, "setup", null);
 _ts_decorate([
+    (0, _throttler.Throttle)({
+        short: {
+            ttl: 60000,
+            limit: 5
+        }
+    }),
     (0, _common.Post)('login'),
     _ts_param(0, (0, _common.Body)()),
     _ts_metadata("design:type", Function),

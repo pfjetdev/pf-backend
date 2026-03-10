@@ -9,6 +9,7 @@ Object.defineProperty(exports, "EventsController", {
     }
 });
 const _common = require("@nestjs/common");
+const _throttler = require("@nestjs/throttler");
 const _rxjs = require("rxjs");
 const _jwt = require("@nestjs/jwt");
 const _eventsservice = require("./events.service");
@@ -48,6 +49,7 @@ let EventsController = class EventsController {
     }
 };
 _ts_decorate([
+    (0, _throttler.SkipThrottle)(),
     (0, _common.Sse)('leads'),
     _ts_param(0, (0, _common.Query)('token')),
     _ts_metadata("design:type", Function),

@@ -9,8 +9,13 @@ import { JwtStrategy } from './jwt.strategy';
   imports: [
     PassportModule,
     JwtModule.register({
-      secret: process.env.JWT_SECRET || 'dev-secret-change-me',
-      signOptions: { expiresIn: '7d' },
+      secret: (() => {
+        if (!process.env.JWT_SECRET) {
+          throw new Error('JWT_SECRET environment variable is required');
+        }
+        return process.env.JWT_SECRET;
+      })(),
+      signOptions: { expiresIn: '8h' },
     }),
   ],
   controllers: [AuthController],

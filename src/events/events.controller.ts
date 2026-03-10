@@ -4,6 +4,7 @@ import {
   Query,
   UnauthorizedException,
 } from '@nestjs/common';
+import { SkipThrottle } from '@nestjs/throttler';
 import { Observable, map } from 'rxjs';
 import { JwtService } from '@nestjs/jwt';
 import { EventsService } from './events.service';
@@ -31,6 +32,7 @@ export class EventsController {
   }
 
   /** Unified admin stream — emits new-lead and new-beat-my-price events */
+  @SkipThrottle()
   @Sse('leads')
   adminStream(@Query('token') token?: string): Observable<MessageEvent> {
     this.verifyToken(token);

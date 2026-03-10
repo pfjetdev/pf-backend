@@ -106,39 +106,34 @@ let AgentsService = class AgentsService {
         return agent;
     }
     async create(dto) {
-        const data = {
-            name: dto.name,
-            email: dto.email,
-            phone: dto.phone || null,
-            avatarUrl: dto.avatarUrl || null,
-            role: dto.role || 'agent',
-            isActive: dto.isActive ?? true
-        };
-        if (dto.password) {
-            data.passwordHash = await _bcryptjs.hash(dto.password, 10);
-        }
         return this.prisma.agent.create({
-            data: data,
+            data: {
+                name: dto.name,
+                email: dto.email,
+                phone: dto.phone || null,
+                avatarUrl: dto.avatarUrl || null,
+                role: dto.role || 'agent',
+                isActive: dto.isActive ?? true,
+                passwordHash: dto.password ? await _bcryptjs.hash(dto.password, 10) : undefined
+            },
             select: SELECT_FIELDS
         });
     }
     async update(id, dto) {
         await this.findOne(id);
-        const data = {};
-        if (dto.name !== undefined) data.name = dto.name;
-        if (dto.email !== undefined) data.email = dto.email;
-        if (dto.phone !== undefined) data.phone = dto.phone || null;
-        if (dto.avatarUrl !== undefined) data.avatarUrl = dto.avatarUrl || null;
-        if (dto.role !== undefined) data.role = dto.role;
-        if (dto.isActive !== undefined) data.isActive = dto.isActive;
-        if (dto.password) {
-            data.passwordHash = await _bcryptjs.hash(dto.password, 10);
-        }
         return this.prisma.agent.update({
             where: {
                 id
             },
-            data: data,
+            data: {
+                name: dto.name,
+                email: dto.email,
+                phone: dto.phone !== undefined ? dto.phone || null : undefined,
+                avatarUrl: dto.avatarUrl !== undefined ? dto.avatarUrl || null : undefined,
+                role: dto.role,
+                isActive: dto.isActive,
+                passwordHash: dto.password ? await _bcryptjs.hash(dto.password, 10) : undefined
+            },
             select: SELECT_FIELDS
         });
     }

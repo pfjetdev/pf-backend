@@ -63,6 +63,20 @@ function _ts_metadata(k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 }
 let AuthService = class AuthService {
+    validatePasswordStrength(password) {
+        if (password.length < 8) {
+            throw new _common.UnauthorizedException('Password must be at least 8 characters');
+        }
+        if (!/[a-z]/.test(password)) {
+            throw new _common.UnauthorizedException('Password must contain a lowercase letter');
+        }
+        if (!/[A-Z]/.test(password)) {
+            throw new _common.UnauthorizedException('Password must contain an uppercase letter');
+        }
+        if (!/\d/.test(password)) {
+            throw new _common.UnauthorizedException('Password must contain a number');
+        }
+    }
     async validateUser(email, password) {
         const agent = await this.prisma.agent.findUnique({
             where: {
@@ -110,9 +124,7 @@ let AuthService = class AuthService {
         if (adminCount > 0) {
             throw new _common.UnauthorizedException('Admin already exists. Use /auth/login');
         }
-        if (password.length < 8) {
-            throw new _common.UnauthorizedException('Password must be at least 8 characters');
-        }
+        this.validatePasswordStrength(password);
         const hash = await _bcryptjs.hash(password, 12);
         const agent = await this.prisma.agent.create({
             data: {
@@ -151,9 +163,7 @@ let AuthService = class AuthService {
         if (!valid) {
             throw new _common.UnauthorizedException('Current password is incorrect');
         }
-        if (newPassword.length < 8) {
-            throw new _common.UnauthorizedException('New password must be at least 8 characters');
-        }
+        this.validatePasswordStrength(newPassword);
         const hash = await _bcryptjs.hash(newPassword, 12);
         await this.prisma.agent.update({
             where: {
