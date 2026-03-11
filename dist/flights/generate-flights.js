@@ -138,11 +138,6 @@ function pickAircraft(rng, distanceKm, isPremiumRoute) {
 }
 // ── Fare classes ──
 const FARE_CLASSES = {
-    economy: [
-        'Economy Saver',
-        'Economy Standard',
-        'Economy Flex'
-    ],
     premium: [
         'Premium Economy',
         'Premium Economy Flex'
@@ -163,11 +158,6 @@ function pickFareClass(rng, cabin) {
 }
 // ── Baggage by cabin ──
 const CABIN_BAGGAGE = {
-    economy: {
-        carryOn: true,
-        checkedBags: 1,
-        checkedBagWeight: '23kg'
-    },
     premium: {
         carryOn: true,
         checkedBags: 2,
@@ -186,10 +176,6 @@ const CABIN_BAGGAGE = {
 };
 // ── Seats left by cabin ──
 const CABIN_SEATS_RANGE = {
-    economy: [
-        3,
-        9
-    ],
     premium: [
         2,
         6
@@ -920,10 +906,6 @@ function calcNextDay(depHour, depMinute, durationMinutes) {
 }
 // ── Pricing defaults ──
 const CABIN_PRICE_RANGE = {
-    economy: [
-        300,
-        1200
-    ],
     premium: [
         800,
         2500
@@ -938,10 +920,6 @@ const CABIN_PRICE_RANGE = {
     ]
 };
 const CABIN_MARKUP_RANGE = {
-    economy: [
-        1.05,
-        1.15
-    ],
     premium: [
         1.10,
         1.25

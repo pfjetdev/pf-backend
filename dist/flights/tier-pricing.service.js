@@ -20,7 +20,6 @@ function _ts_metadata(k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 }
 /** Default tier multipliers (relative to business = 1.0) */ const DEFAULT_MULTIPLIER = {
-    economy: 0.18,
     premium: 0.52,
     business: 1,
     first: 2.15
@@ -63,7 +62,6 @@ let TierPricingService = class TierPricingService {
     }
     parseMultipliers(settings) {
         return {
-            economy: this.parseSetting(settings, 'variant_b_tier_multiplier_economy', DEFAULT_MULTIPLIER.economy),
             premium: this.parseSetting(settings, 'variant_b_tier_multiplier_premium', DEFAULT_MULTIPLIER.premium),
             business: this.parseSetting(settings, 'variant_b_tier_multiplier_business', DEFAULT_MULTIPLIER.business),
             first: this.parseSetting(settings, 'variant_b_tier_multiplier_first', DEFAULT_MULTIPLIER.first)

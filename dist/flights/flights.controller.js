@@ -46,7 +46,6 @@ let FlightsController = class FlightsController {
             depart,
             return: returnDate || undefined,
             cabin: [
-                'economy',
                 'premium',
                 'business',
                 'first'

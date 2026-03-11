@@ -836,11 +836,9 @@ async function main() {
       { key: "homepage_ab_default_variant", value: "A" },
       // Flight generator config
       { key: "flight_result_count", value: "8" },
-      { key: "flight_price_economy", value: "300,1200" },
       { key: "flight_price_premium", value: "800,2500" },
       { key: "flight_price_business", value: "2200,7000" },
       { key: "flight_price_first", value: "5500,15000" },
-      { key: "flight_markup_economy", value: "1.05,1.15" },
       { key: "flight_markup_premium", value: "1.10,1.25" },
       { key: "flight_markup_business", value: "1.20,1.50" },
       { key: "flight_markup_first", value: "1.25,1.60" },
@@ -862,7 +860,6 @@ async function main() {
       // Codeshare
       { key: "flight_codeshare_probability", value: "0.15" },
       // Seats per cabin
-      { key: "flight_seats_economy", value: "3,9" },
       { key: "flight_seats_premium", value: "2,6" },
       { key: "flight_seats_business", value: "2,5" },
       { key: "flight_seats_first", value: "1,3" },

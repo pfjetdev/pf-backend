@@ -40,7 +40,7 @@ export class FlightsController {
       to: to.toUpperCase(),
       depart,
       return: returnDate || undefined,
-      cabin: (['economy', 'premium', 'business', 'first'].includes(cabin || '') ? cabin : 'business') as SearchParams['cabin'],
+      cabin: (['premium', 'business', 'first'].includes(cabin || '') ? cabin : 'business') as SearchParams['cabin'],
       adults: parseInt(adults || '1', 10) || 1,
       children: parseInt(children || '0', 10) || 0,
       infants: parseInt(infants || '0', 10) || 0,

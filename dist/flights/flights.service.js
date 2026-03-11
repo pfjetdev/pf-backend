@@ -135,7 +135,6 @@ FlightsService = _ts_decorate([
         }
     }
     const cabins = [
-        'economy',
         'premium',
         'business',
         'first'

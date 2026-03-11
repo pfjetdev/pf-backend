@@ -109,7 +109,6 @@ function pickAircraft(rng: () => number, distanceKm: number, isPremiumRoute: boo
 // ── Fare classes ──
 
 const FARE_CLASSES: Record<string, string[]> = {
-  economy: ['Economy Saver', 'Economy Standard', 'Economy Flex'],
   premium: ['Premium Economy', 'Premium Economy Flex'],
   business: ['Business Saver', 'Business Classic', 'Business Flex'],
   first: ['First Class', 'First Class Suite'],
@@ -123,7 +122,6 @@ function pickFareClass(rng: () => number, cabin: string): string {
 // ── Baggage by cabin ──
 
 const CABIN_BAGGAGE: Record<string, BaggageInfo> = {
-  economy: { carryOn: true, checkedBags: 1, checkedBagWeight: '23kg' },
   premium: { carryOn: true, checkedBags: 2, checkedBagWeight: '23kg' },
   business: { carryOn: true, checkedBags: 2, checkedBagWeight: '32kg' },
   first: { carryOn: true, checkedBags: 3, checkedBagWeight: '32kg' },
@@ -132,7 +130,6 @@ const CABIN_BAGGAGE: Record<string, BaggageInfo> = {
 // ── Seats left by cabin ──
 
 const CABIN_SEATS_RANGE: Record<string, [number, number]> = {
-  economy: [3, 9],
   premium: [2, 6],
   business: [2, 5],
   first: [1, 3],
@@ -462,12 +459,12 @@ function calcNextDay(depHour: number, depMinute: number, durationMinutes: number
 // ── Pricing defaults ──
 
 const CABIN_PRICE_RANGE: Record<string, [number, number]> = {
-  economy: [300, 1200], premium: [800, 2500],
+  premium: [800, 2500],
   business: [2200, 7000], first: [5500, 15000],
 };
 
 const CABIN_MARKUP_RANGE: Record<string, [number, number]> = {
-  economy: [1.05, 1.15], premium: [1.10, 1.25],
+  premium: [1.10, 1.25],
   business: [1.20, 1.50], first: [1.25, 1.60],
 };
 

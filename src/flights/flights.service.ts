@@ -127,7 +127,7 @@ function parseFlightConfig(
     }
   }
 
-  const cabins = ['economy', 'premium', 'business', 'first'] as const;
+  const cabins = ['premium', 'business', 'first'] as const;
 
   const priceRange: Record<string, [number, number]> = {};
   let hasPriceRange = false;

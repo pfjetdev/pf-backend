@@ -4,7 +4,6 @@ import type { TierPricing } from './flights.types';
 
 /** Default tier multipliers (relative to business = 1.0) */
 const DEFAULT_MULTIPLIER: Record<string, number> = {
-  economy: 0.18,
   premium: 0.52,
   business: 1,
   first: 2.15,
@@ -61,7 +60,6 @@ export class TierPricingService {
 
   private parseMultipliers(settings: Record<string, string>): Record<string, number> {
     return {
-      economy: this.parseSetting(settings, 'variant_b_tier_multiplier_economy', DEFAULT_MULTIPLIER.economy),
       premium: this.parseSetting(settings, 'variant_b_tier_multiplier_premium', DEFAULT_MULTIPLIER.premium),
       business: this.parseSetting(settings, 'variant_b_tier_multiplier_business', DEFAULT_MULTIPLIER.business),
       first: this.parseSetting(settings, 'variant_b_tier_multiplier_first', DEFAULT_MULTIPLIER.first),

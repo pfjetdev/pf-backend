@@ -3,7 +3,7 @@ export class SearchFlightsDto {
   to!: string;
   depart!: string;
   return?: string;
-  cabin?: 'economy' | 'premium' | 'business' | 'first';
+  cabin?: 'premium' | 'business' | 'first';
   adults?: number;
   children?: number;
   infants?: number;
