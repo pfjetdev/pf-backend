@@ -13,9 +13,9 @@ async function bootstrap() {
     throw new Error(`Missing env vars: ${missing.join(', ')}`);
   }
 
-  const app = await NestFactory.create(AppModule, { bodyParser: true });
+  const app = await NestFactory.create(AppModule, { bodyParser: false });
 
-  // Limit request body size to prevent OOM
+  // Register body parsers with size limit to prevent OOM
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const express = require('express');
   app.use(express.json({ limit: '1mb' }));

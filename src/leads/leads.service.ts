@@ -72,7 +72,8 @@ export class LeadsService {
         createdAt: lead.createdAt,
       });
     } catch (err) {
-      this.logger.error('Failed to emit new lead event', err);
+      // emitNewLead is synchronous (Subject.next), so this catch works
+      this.logger.error('Failed to emit new lead event', err instanceof Error ? err.stack : String(err));
     }
 
     return lead;

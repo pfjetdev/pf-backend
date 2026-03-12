@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsNumber, IsEnum, MaxLength, Min, IsUUID } from 'class-validator';
+import { IsString, IsOptional, IsNumber, IsEnum, MaxLength, Min, IsUUID, ValidateIf } from 'class-validator';
 
 export enum BmpStatus {
   NEW = 'new',
@@ -14,11 +14,13 @@ export class UpdateBeatMyPriceDto {
   status?: string;
 
   @IsOptional()
+  @ValidateIf((o) => o.ourPrice !== null)
   @IsNumber()
   @Min(0)
   ourPrice?: number | null;
 
   @IsOptional()
+  @ValidateIf((o) => o.agentId !== null)
   @IsUUID('4')
   agentId?: string | null;
 

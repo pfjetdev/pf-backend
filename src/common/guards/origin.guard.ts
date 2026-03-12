@@ -30,11 +30,11 @@ export class OriginGuard implements CanActivate {
 
     const origin = request.headers['origin'];
     if (!origin) {
-      // Allow server-to-server only if request has valid JWT (authenticated)
-      // Otherwise reject — browsers always send Origin on cross-origin requests
-      const hasAuth = !!request.headers['authorization'] || !!request.cookies?.token;
-      if (hasAuth) return true;
-      throw new ForbiddenException('Origin header required');
+      // No Origin header = not a browser cross-origin request.
+      // Same-origin browser forms and server-to-server calls omit Origin.
+      // Since all admin routes require JWT (verified by JwtAuthGuard),
+      // and public POST routes have throttling, this is acceptable.
+      return true;
     }
 
     if (ALLOWED_ORIGINS.includes(origin)) {

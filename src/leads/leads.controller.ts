@@ -50,10 +50,10 @@ export class LeadsController {
     @Query('dateTo') dateTo?: string,
     @Query('cabinClass') cabinClass?: string,
     @Query('agentId') agentId?: string,
-    @Res() res?: Response,
+    @Res({ passthrough: true }) res?: Response,
   ) {
     const csv = await this.leadsService.exportCsv({
-      status, source, search, sortBy, sortOrder,
+      status, source, search: search?.slice(0, 500), sortBy, sortOrder,
       dateFrom, dateTo, cabinClass, agentId,
     });
     res!.setHeader('Content-Type', 'text/csv; charset=utf-8');

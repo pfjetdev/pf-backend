@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsNumber, IsEnum, MaxLength, Min, IsUUID } from 'class-validator';
+import { IsString, IsOptional, IsNumber, IsEnum, MaxLength, Min, IsUUID, ValidateIf } from 'class-validator';
 
 export enum LeadStatus {
   NEW = 'new',
@@ -15,6 +15,7 @@ export class UpdateLeadDto {
   status?: string;
 
   @IsOptional()
+  @ValidateIf((o) => o.agentId !== null)
   @IsUUID('4')
   agentId?: string | null;
 
@@ -24,6 +25,7 @@ export class UpdateLeadDto {
   agentNotes?: string;
 
   @IsOptional()
+  @ValidateIf((o) => o.quotedPrice !== null)
   @IsNumber()
   @Min(0)
   quotedPrice?: number | null;

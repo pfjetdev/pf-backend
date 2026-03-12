@@ -56,7 +56,7 @@ export class BlogService {
   async findOne(id: string) {
     const post = await this.prisma.blogPost.findUnique({ where: { id } });
     if (!post) {
-      throw new NotFoundException(`Blog post with id ${id} not found`);
+      throw new NotFoundException('Blog post not found');
     }
     return post;
   }

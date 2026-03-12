@@ -3,10 +3,11 @@
  * Also prevents CSV formula injection by prefixing dangerous characters.
  */
 export function escapeCsvField(val: string): string {
-  if (/^[=+\-@\t\r]/.test(val)) {
+  const needsFormulaEscape = /^[=+\-@\t\r]/.test(val);
+  if (needsFormulaEscape) {
     val = `'${val}`;
   }
-  if (val.includes(',') || val.includes('"') || val.includes('\n')) {
+  if (needsFormulaEscape || val.includes(',') || val.includes('"') || val.includes('\n')) {
     return `"${val.replace(/"/g, '""')}"`;
   }
   return val;
@@ -19,7 +20,7 @@ export function buildCsv(
   headers: string[],
   rows: string[][],
 ): string {
-  const headerLine = headers.join(',');
+  const headerLine = headers.map(escapeCsvField).join(',');
   const dataLines = rows.map((row) => row.map(escapeCsvField).join(','));
   return [headerLine, ...dataLines].join('\n');
 }

@@ -48,10 +48,10 @@ export class BeatMyPriceController {
     @Query('dateFrom') dateFrom?: string,
     @Query('dateTo') dateTo?: string,
     @Query('agentId') agentId?: string,
-    @Res() res?: Response,
+    @Res({ passthrough: true }) res?: Response,
   ) {
     const csv = await this.beatMyPriceService.exportCsv({
-      status, search, sortBy, sortOrder, dateFrom, dateTo, agentId,
+      status, search: search?.slice(0, 500), sortBy, sortOrder, dateFrom, dateTo, agentId,
     });
     res!.setHeader('Content-Type', 'text/csv; charset=utf-8');
     res!.setHeader('Content-Disposition', 'attachment; filename=beat-my-price.csv');

@@ -56,7 +56,8 @@ export class BeatMyPriceService {
         createdAt: req.createdAt,
       });
     } catch (err) {
-      this.logger.error('Failed to emit new beat-my-price event', err);
+      // emitNewBeatMyPrice is synchronous (Subject.next), so this catch works
+      this.logger.error('Failed to emit new beat-my-price event', err instanceof Error ? err.stack : String(err));
     }
 
     return req;
