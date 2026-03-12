@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { EventsService } from '../events/events.service';
 import { CreateLeadDto } from './dto/create-lead.dto';
@@ -23,8 +23,12 @@ interface FindAllQuery {
 
 const AGENT_SELECT = { select: { id: true, name: true } } as const;
 
+const CSV_EXPORT_LIMIT = 10_000;
+
 @Injectable()
 export class LeadsService {
+  private readonly logger = new Logger(LeadsService.name);
+
   constructor(
     private prisma: PrismaService,
     private eventsService: EventsService,
@@ -56,16 +60,20 @@ export class LeadsService {
       },
     });
 
-    this.eventsService.emitNewLead({
-      id: lead.id,
-      name: lead.name,
-      phone: lead.phone,
-      origin: lead.origin ?? undefined,
-      destination: lead.destination ?? undefined,
-      cabinClass: lead.cabinClass ?? undefined,
-      source: lead.source ?? undefined,
-      createdAt: lead.createdAt,
-    });
+    try {
+      this.eventsService.emitNewLead({
+        id: lead.id,
+        name: lead.name,
+        phone: lead.phone,
+        origin: lead.origin ?? undefined,
+        destination: lead.destination ?? undefined,
+        cabinClass: lead.cabinClass ?? undefined,
+        source: lead.source ?? undefined,
+        createdAt: lead.createdAt,
+      });
+    } catch (err) {
+      this.logger.error('Failed to emit new lead event', err);
+    }
 
     return lead;
   }
@@ -168,6 +176,7 @@ export class LeadsService {
     const leads = await this.prisma.lead.findMany({
       where,
       orderBy,
+      take: CSV_EXPORT_LIMIT,
       include: { agent: AGENT_SELECT },
     });
 

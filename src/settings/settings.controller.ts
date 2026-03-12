@@ -8,9 +8,23 @@ import { Roles } from '../auth/roles.decorator';
 export class SettingsController {
   constructor(private readonly settingsService: SettingsService) {}
 
-  // Public — needed by search page server component
+  // Public — needed by search page server component (only public keys)
   @Get()
-  getAll() {
+  async getAll() {
+    const all = await this.settingsService.getAll();
+    const PUBLIC_KEYS = new Set(['ab_test_enabled', 'ab_default_variant']);
+    const filtered: Record<string, string> = {};
+    for (const [key, value] of Object.entries(all)) {
+      if (PUBLIC_KEYS.has(key)) filtered[key] = value;
+    }
+    return filtered;
+  }
+
+  // Protected — admin sees all settings
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin')
+  @Get('all')
+  getAllAdmin() {
     return this.settingsService.getAll();
   }
 

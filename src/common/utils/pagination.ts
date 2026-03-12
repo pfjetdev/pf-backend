@@ -1,6 +1,23 @@
 const MAX_LIMIT = 100;
 const DEFAULT_LIMIT = 25;
 
+/** Whitelist of columns allowed for sorting — prevents prototype pollution */
+const ALLOWED_SORT_FIELDS = new Set([
+  'createdAt',
+  'updatedAt',
+  'email',
+  'name',
+  'status',
+  'phone',
+  'origin',
+  'destination',
+  'cabinClass',
+  'source',
+  'competitorPrice',
+  'ourPrice',
+  'quotedPrice',
+]);
+
 export interface PaginationQuery {
   page?: number;
   limit?: number;
@@ -17,12 +34,16 @@ export interface PaginatedResult<T> {
 }
 
 export function parsePagination(query?: PaginationQuery) {
-  const page = query?.page || 1;
-  const limit = Math.min(query?.limit || DEFAULT_LIMIT, MAX_LIMIT);
+  const page = Math.max(query?.page || 1, 1);
+  const limit = Math.min(Math.max(query?.limit || DEFAULT_LIMIT, 1), MAX_LIMIT);
   const skip = (page - 1) * limit;
 
-  const orderBy: Record<string, string> = {};
-  orderBy[query?.sortBy || 'createdAt'] = query?.sortOrder || 'desc';
+  const sortField = ALLOWED_SORT_FIELDS.has(query?.sortBy ?? '')
+    ? query!.sortBy!
+    : 'createdAt';
+  const sortOrder = query?.sortOrder === 'asc' ? 'asc' : 'desc';
+
+  const orderBy: Record<string, string> = { [sortField]: sortOrder };
 
   return { page, limit, skip, orderBy };
 }

@@ -40,6 +40,7 @@ export type BeatMyPriceRequestMinAggregateOutputType = {
   id: string | null
   origin: string | null
   destination: string | null
+  cabinClass: string | null
   competitorPrice: runtime.Decimal | null
   competitorUrl: string | null
   screenshotUrl: string | null
@@ -57,6 +58,7 @@ export type BeatMyPriceRequestMaxAggregateOutputType = {
   id: string | null
   origin: string | null
   destination: string | null
+  cabinClass: string | null
   competitorPrice: runtime.Decimal | null
   competitorUrl: string | null
   screenshotUrl: string | null
@@ -74,6 +76,7 @@ export type BeatMyPriceRequestCountAggregateOutputType = {
   id: number
   origin: number
   destination: number
+  cabinClass: number
   competitorPrice: number
   competitorUrl: number
   screenshotUrl: number
@@ -103,6 +106,7 @@ export type BeatMyPriceRequestMinAggregateInputType = {
   id?: true
   origin?: true
   destination?: true
+  cabinClass?: true
   competitorPrice?: true
   competitorUrl?: true
   screenshotUrl?: true
@@ -120,6 +124,7 @@ export type BeatMyPriceRequestMaxAggregateInputType = {
   id?: true
   origin?: true
   destination?: true
+  cabinClass?: true
   competitorPrice?: true
   competitorUrl?: true
   screenshotUrl?: true
@@ -137,6 +142,7 @@ export type BeatMyPriceRequestCountAggregateInputType = {
   id?: true
   origin?: true
   destination?: true
+  cabinClass?: true
   competitorPrice?: true
   competitorUrl?: true
   screenshotUrl?: true
@@ -241,6 +247,7 @@ export type BeatMyPriceRequestGroupByOutputType = {
   id: string
   origin: string | null
   destination: string | null
+  cabinClass: string | null
   competitorPrice: runtime.Decimal | null
   competitorUrl: string | null
   screenshotUrl: string | null
@@ -281,6 +288,7 @@ export type BeatMyPriceRequestWhereInput = {
   id?: Prisma.UuidFilter<"BeatMyPriceRequest"> | string
   origin?: Prisma.StringNullableFilter<"BeatMyPriceRequest"> | string | null
   destination?: Prisma.StringNullableFilter<"BeatMyPriceRequest"> | string | null
+  cabinClass?: Prisma.StringNullableFilter<"BeatMyPriceRequest"> | string | null
   competitorPrice?: Prisma.DecimalNullableFilter<"BeatMyPriceRequest"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   competitorUrl?: Prisma.StringNullableFilter<"BeatMyPriceRequest"> | string | null
   screenshotUrl?: Prisma.StringNullableFilter<"BeatMyPriceRequest"> | string | null
@@ -299,6 +307,7 @@ export type BeatMyPriceRequestOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   origin?: Prisma.SortOrderInput | Prisma.SortOrder
   destination?: Prisma.SortOrderInput | Prisma.SortOrder
+  cabinClass?: Prisma.SortOrderInput | Prisma.SortOrder
   competitorPrice?: Prisma.SortOrderInput | Prisma.SortOrder
   competitorUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   screenshotUrl?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -320,6 +329,7 @@ export type BeatMyPriceRequestWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.BeatMyPriceRequestWhereInput | Prisma.BeatMyPriceRequestWhereInput[]
   origin?: Prisma.StringNullableFilter<"BeatMyPriceRequest"> | string | null
   destination?: Prisma.StringNullableFilter<"BeatMyPriceRequest"> | string | null
+  cabinClass?: Prisma.StringNullableFilter<"BeatMyPriceRequest"> | string | null
   competitorPrice?: Prisma.DecimalNullableFilter<"BeatMyPriceRequest"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   competitorUrl?: Prisma.StringNullableFilter<"BeatMyPriceRequest"> | string | null
   screenshotUrl?: Prisma.StringNullableFilter<"BeatMyPriceRequest"> | string | null
@@ -338,6 +348,7 @@ export type BeatMyPriceRequestOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   origin?: Prisma.SortOrderInput | Prisma.SortOrder
   destination?: Prisma.SortOrderInput | Prisma.SortOrder
+  cabinClass?: Prisma.SortOrderInput | Prisma.SortOrder
   competitorPrice?: Prisma.SortOrderInput | Prisma.SortOrder
   competitorUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   screenshotUrl?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -363,6 +374,7 @@ export type BeatMyPriceRequestScalarWhereWithAggregatesInput = {
   id?: Prisma.UuidWithAggregatesFilter<"BeatMyPriceRequest"> | string
   origin?: Prisma.StringNullableWithAggregatesFilter<"BeatMyPriceRequest"> | string | null
   destination?: Prisma.StringNullableWithAggregatesFilter<"BeatMyPriceRequest"> | string | null
+  cabinClass?: Prisma.StringNullableWithAggregatesFilter<"BeatMyPriceRequest"> | string | null
   competitorPrice?: Prisma.DecimalNullableWithAggregatesFilter<"BeatMyPriceRequest"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   competitorUrl?: Prisma.StringNullableWithAggregatesFilter<"BeatMyPriceRequest"> | string | null
   screenshotUrl?: Prisma.StringNullableWithAggregatesFilter<"BeatMyPriceRequest"> | string | null
@@ -380,6 +392,7 @@ export type BeatMyPriceRequestCreateInput = {
   id?: string
   origin?: string | null
   destination?: string | null
+  cabinClass?: string | null
   competitorPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   competitorUrl?: string | null
   screenshotUrl?: string | null
@@ -397,6 +410,7 @@ export type BeatMyPriceRequestUncheckedCreateInput = {
   id?: string
   origin?: string | null
   destination?: string | null
+  cabinClass?: string | null
   competitorPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   competitorUrl?: string | null
   screenshotUrl?: string | null
@@ -414,6 +428,7 @@ export type BeatMyPriceRequestUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   origin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   destination?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cabinClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   competitorPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   competitorUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   screenshotUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -431,6 +446,7 @@ export type BeatMyPriceRequestUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   origin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   destination?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cabinClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   competitorPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   competitorUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   screenshotUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -448,6 +464,7 @@ export type BeatMyPriceRequestCreateManyInput = {
   id?: string
   origin?: string | null
   destination?: string | null
+  cabinClass?: string | null
   competitorPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   competitorUrl?: string | null
   screenshotUrl?: string | null
@@ -465,6 +482,7 @@ export type BeatMyPriceRequestUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   origin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   destination?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cabinClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   competitorPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   competitorUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   screenshotUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -481,6 +499,7 @@ export type BeatMyPriceRequestUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   origin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   destination?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cabinClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   competitorPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   competitorUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   screenshotUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -508,6 +527,7 @@ export type BeatMyPriceRequestCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   origin?: Prisma.SortOrder
   destination?: Prisma.SortOrder
+  cabinClass?: Prisma.SortOrder
   competitorPrice?: Prisma.SortOrder
   competitorUrl?: Prisma.SortOrder
   screenshotUrl?: Prisma.SortOrder
@@ -530,6 +550,7 @@ export type BeatMyPriceRequestMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   origin?: Prisma.SortOrder
   destination?: Prisma.SortOrder
+  cabinClass?: Prisma.SortOrder
   competitorPrice?: Prisma.SortOrder
   competitorUrl?: Prisma.SortOrder
   screenshotUrl?: Prisma.SortOrder
@@ -547,6 +568,7 @@ export type BeatMyPriceRequestMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   origin?: Prisma.SortOrder
   destination?: Prisma.SortOrder
+  cabinClass?: Prisma.SortOrder
   competitorPrice?: Prisma.SortOrder
   competitorUrl?: Prisma.SortOrder
   screenshotUrl?: Prisma.SortOrder
@@ -611,6 +633,7 @@ export type BeatMyPriceRequestCreateWithoutAgentInput = {
   id?: string
   origin?: string | null
   destination?: string | null
+  cabinClass?: string | null
   competitorPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   competitorUrl?: string | null
   screenshotUrl?: string | null
@@ -627,6 +650,7 @@ export type BeatMyPriceRequestUncheckedCreateWithoutAgentInput = {
   id?: string
   origin?: string | null
   destination?: string | null
+  cabinClass?: string | null
   competitorPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   competitorUrl?: string | null
   screenshotUrl?: string | null
@@ -672,6 +696,7 @@ export type BeatMyPriceRequestScalarWhereInput = {
   id?: Prisma.UuidFilter<"BeatMyPriceRequest"> | string
   origin?: Prisma.StringNullableFilter<"BeatMyPriceRequest"> | string | null
   destination?: Prisma.StringNullableFilter<"BeatMyPriceRequest"> | string | null
+  cabinClass?: Prisma.StringNullableFilter<"BeatMyPriceRequest"> | string | null
   competitorPrice?: Prisma.DecimalNullableFilter<"BeatMyPriceRequest"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   competitorUrl?: Prisma.StringNullableFilter<"BeatMyPriceRequest"> | string | null
   screenshotUrl?: Prisma.StringNullableFilter<"BeatMyPriceRequest"> | string | null
@@ -689,6 +714,7 @@ export type BeatMyPriceRequestCreateManyAgentInput = {
   id?: string
   origin?: string | null
   destination?: string | null
+  cabinClass?: string | null
   competitorPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   competitorUrl?: string | null
   screenshotUrl?: string | null
@@ -705,6 +731,7 @@ export type BeatMyPriceRequestUpdateWithoutAgentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   origin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   destination?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cabinClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   competitorPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   competitorUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   screenshotUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -721,6 +748,7 @@ export type BeatMyPriceRequestUncheckedUpdateWithoutAgentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   origin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   destination?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cabinClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   competitorPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   competitorUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   screenshotUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -737,6 +765,7 @@ export type BeatMyPriceRequestUncheckedUpdateManyWithoutAgentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   origin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   destination?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cabinClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   competitorPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   competitorUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   screenshotUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -755,6 +784,7 @@ export type BeatMyPriceRequestSelect<ExtArgs extends runtime.Types.Extensions.In
   id?: boolean
   origin?: boolean
   destination?: boolean
+  cabinClass?: boolean
   competitorPrice?: boolean
   competitorUrl?: boolean
   screenshotUrl?: boolean
@@ -773,6 +803,7 @@ export type BeatMyPriceRequestSelectCreateManyAndReturn<ExtArgs extends runtime.
   id?: boolean
   origin?: boolean
   destination?: boolean
+  cabinClass?: boolean
   competitorPrice?: boolean
   competitorUrl?: boolean
   screenshotUrl?: boolean
@@ -791,6 +822,7 @@ export type BeatMyPriceRequestSelectUpdateManyAndReturn<ExtArgs extends runtime.
   id?: boolean
   origin?: boolean
   destination?: boolean
+  cabinClass?: boolean
   competitorPrice?: boolean
   competitorUrl?: boolean
   screenshotUrl?: boolean
@@ -809,6 +841,7 @@ export type BeatMyPriceRequestSelectScalar = {
   id?: boolean
   origin?: boolean
   destination?: boolean
+  cabinClass?: boolean
   competitorPrice?: boolean
   competitorUrl?: boolean
   screenshotUrl?: boolean
@@ -822,7 +855,7 @@ export type BeatMyPriceRequestSelectScalar = {
   updatedAt?: boolean
 }
 
-export type BeatMyPriceRequestOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "origin" | "destination" | "competitorPrice" | "competitorUrl" | "screenshotUrl" | "phone" | "email" | "status" | "ourPrice" | "agentId" | "agentNotes" | "createdAt" | "updatedAt", ExtArgs["result"]["beatMyPriceRequest"]>
+export type BeatMyPriceRequestOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "origin" | "destination" | "cabinClass" | "competitorPrice" | "competitorUrl" | "screenshotUrl" | "phone" | "email" | "status" | "ourPrice" | "agentId" | "agentNotes" | "createdAt" | "updatedAt", ExtArgs["result"]["beatMyPriceRequest"]>
 export type BeatMyPriceRequestInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   agent?: boolean | Prisma.BeatMyPriceRequest$agentArgs<ExtArgs>
 }
@@ -842,6 +875,7 @@ export type $BeatMyPriceRequestPayload<ExtArgs extends runtime.Types.Extensions.
     id: string
     origin: string | null
     destination: string | null
+    cabinClass: string | null
     competitorPrice: runtime.Decimal | null
     competitorUrl: string | null
     screenshotUrl: string | null
@@ -1280,6 +1314,7 @@ export interface BeatMyPriceRequestFieldRefs {
   readonly id: Prisma.FieldRef<"BeatMyPriceRequest", 'String'>
   readonly origin: Prisma.FieldRef<"BeatMyPriceRequest", 'String'>
   readonly destination: Prisma.FieldRef<"BeatMyPriceRequest", 'String'>
+  readonly cabinClass: Prisma.FieldRef<"BeatMyPriceRequest", 'String'>
   readonly competitorPrice: Prisma.FieldRef<"BeatMyPriceRequest", 'Decimal'>
   readonly competitorUrl: Prisma.FieldRef<"BeatMyPriceRequest", 'String'>
   readonly screenshotUrl: Prisma.FieldRef<"BeatMyPriceRequest", 'String'>

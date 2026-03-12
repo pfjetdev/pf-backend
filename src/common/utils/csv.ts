@@ -1,7 +1,11 @@
 /**
  * Escapes a CSV field value (RFC 4180).
+ * Also prevents CSV formula injection by prefixing dangerous characters.
  */
 export function escapeCsvField(val: string): string {
+  if (/^[=+\-@\t\r]/.test(val)) {
+    val = `'${val}`;
+  }
   if (val.includes(',') || val.includes('"') || val.includes('\n')) {
     return `"${val.replace(/"/g, '""')}"`;
   }

@@ -30,9 +30,11 @@ export class OriginGuard implements CanActivate {
 
     const origin = request.headers['origin'];
     if (!origin) {
-      // Server-to-server calls (no browser) won't have Origin
-      // Allow if no Origin header is present (API-to-API)
-      return true;
+      // Allow server-to-server only if request has valid JWT (authenticated)
+      // Otherwise reject — browsers always send Origin on cross-origin requests
+      const hasAuth = !!request.headers['authorization'] || !!request.cookies?.token;
+      if (hasAuth) return true;
+      throw new ForbiddenException('Origin header required');
     }
 
     if (ALLOWED_ORIGINS.includes(origin)) {

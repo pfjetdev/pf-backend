@@ -7,6 +7,7 @@ import {
   Param,
   Body,
   UseGuards,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { BlogService } from './blog.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -34,7 +35,7 @@ export class BlogController {
   @Get('admin/:id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
-  findOneAdmin(@Param('id') id: string) {
+  findOneAdmin(@Param('id', ParseUUIDPipe) id: string) {
     return this.blogService.findOne(id);
   }
 
@@ -53,14 +54,14 @@ export class BlogController {
   @Patch(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
-  update(@Param('id') id: string, @Body() dto: UpdateBlogPostDto) {
+  update(@Param('id', ParseUUIDPipe) id: string, @Body() dto: UpdateBlogPostDto) {
     return this.blogService.update(id, dto);
   }
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
-  remove(@Param('id') id: string) {
+  remove(@Param('id', ParseUUIDPipe) id: string) {
     return this.blogService.remove(id);
   }
 }

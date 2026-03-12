@@ -5,7 +5,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { SkipThrottle } from '@nestjs/throttler';
-import { Observable, map } from 'rxjs';
+import { Observable, map, takeUntil, timer } from 'rxjs';
 import { JwtService } from '@nestjs/jwt';
 import { EventsService } from './events.service';
 
@@ -37,7 +37,9 @@ export class EventsController {
   adminStream(@Query('token') token?: string): Observable<MessageEvent> {
     this.verifyToken(token);
 
+    // Auto-close SSE after 4 hours to prevent connection/memory leaks
     return this.eventsService.adminEvents$.pipe(
+      takeUntil(timer(4 * 60 * 60 * 1000)),
       map((event) => ({
         data: JSON.stringify(event.data),
         type: event.type,

@@ -9,18 +9,28 @@ import {
   Query,
   Res,
   UseGuards,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { LeadsService } from './leads.service';
 import { CreateLeadDto } from './dto/create-lead.dto';
 import { UpdateLeadDto } from './dto/update-lead.dto';
+import { BulkStatusDto, BulkAssignDto, BulkIdsDto } from '../common/dto/bulk-operations.dto';
+import { Throttle } from '@nestjs/throttler';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+
+function safeInt(val?: string): number | undefined {
+  if (!val) return undefined;
+  const n = parseInt(val, 10);
+  return isNaN(n) ? undefined : n;
+}
 
 @Controller('leads')
 export class LeadsController {
   constructor(private readonly leadsService: LeadsService) {}
 
-  // Public — used by frontend forms
+  // Public — used by frontend forms (stricter rate limit: 3 per 60s per IP)
+  @Throttle({ short: { ttl: 60000, limit: 3 } })
   @Post()
   create(@Body() dto: CreateLeadDto) {
     return this.leadsService.create(dto);
@@ -59,19 +69,19 @@ export class LeadsController {
 
   @UseGuards(JwtAuthGuard)
   @Patch('bulk/status')
-  bulkUpdateStatus(@Body() dto: { ids: string[]; status: string }) {
+  bulkUpdateStatus(@Body() dto: BulkStatusDto) {
     return this.leadsService.bulkUpdateStatus(dto.ids, dto.status);
   }
 
   @UseGuards(JwtAuthGuard)
   @Patch('bulk/assign')
-  bulkAssignAgent(@Body() dto: { ids: string[]; agentId: string | null }) {
+  bulkAssignAgent(@Body() dto: BulkAssignDto) {
     return this.leadsService.bulkAssignAgent(dto.ids, dto.agentId);
   }
 
   @UseGuards(JwtAuthGuard)
   @Post('bulk/delete')
-  bulkDelete(@Body() dto: { ids: string[] }) {
+  bulkDelete(@Body() dto: BulkIdsDto) {
     return this.leadsService.bulkDelete(dto.ids);
   }
 
@@ -93,9 +103,9 @@ export class LeadsController {
     @Query('agentId') agentId?: string,
   ) {
     return this.leadsService.findAll({
-      page: page ? parseInt(page, 10) : undefined,
-      limit: limit ? parseInt(limit, 10) : undefined,
-      status, source, search, sortBy, sortOrder,
+      page: safeInt(page),
+      limit: safeInt(limit),
+      status, source, search: search?.slice(0, 500), sortBy, sortOrder,
       dateFrom, dateTo, cabinClass, agentId,
     });
   }
@@ -104,19 +114,19 @@ export class LeadsController {
 
   @UseGuards(JwtAuthGuard)
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id', ParseUUIDPipe) id: string) {
     return this.leadsService.findOne(id);
   }
 
   @UseGuards(JwtAuthGuard)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() dto: UpdateLeadDto) {
+  update(@Param('id', ParseUUIDPipe) id: string, @Body() dto: UpdateLeadDto) {
     return this.leadsService.update(id, dto);
   }
 
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  remove(@Param('id', ParseUUIDPipe) id: string) {
     return this.leadsService.remove(id);
   }
 }

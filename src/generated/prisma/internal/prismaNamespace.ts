@@ -1344,6 +1344,7 @@ export const BeatMyPriceRequestScalarFieldEnum = {
   id: 'id',
   origin: 'origin',
   destination: 'destination',
+  cabinClass: 'cabinClass',
   competitorPrice: 'competitorPrice',
   competitorUrl: 'competitorUrl',
   screenshotUrl: 'screenshotUrl',

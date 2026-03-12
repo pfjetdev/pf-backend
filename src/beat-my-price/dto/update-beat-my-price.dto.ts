@@ -1,19 +1,29 @@
-import { IsString, IsOptional, IsNumber } from 'class-validator';
+import { IsString, IsOptional, IsNumber, IsEnum, MaxLength, Min, IsUUID } from 'class-validator';
+
+export enum BmpStatus {
+  NEW = 'new',
+  REVIEWING = 'reviewing',
+  QUOTED = 'quoted',
+  WON = 'won',
+  LOST = 'lost',
+}
 
 export class UpdateBeatMyPriceDto {
   @IsOptional()
-  @IsString()
+  @IsEnum(BmpStatus)
   status?: string;
 
   @IsOptional()
   @IsNumber()
+  @Min(0)
   ourPrice?: number | null;
 
   @IsOptional()
-  @IsString()
+  @IsUUID('4')
   agentId?: string | null;
 
   @IsOptional()
   @IsString()
+  @MaxLength(5000)
   agentNotes?: string;
 }

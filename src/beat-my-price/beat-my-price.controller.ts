@@ -9,18 +9,28 @@ import {
   Query,
   Res,
   UseGuards,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { BeatMyPriceService } from './beat-my-price.service';
 import { CreateBeatMyPriceDto } from './dto/create-beat-my-price.dto';
 import { UpdateBeatMyPriceDto } from './dto/update-beat-my-price.dto';
+import { BulkStatusDto, BulkAssignDto, BulkIdsDto } from '../common/dto/bulk-operations.dto';
+import { Throttle } from '@nestjs/throttler';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+
+function safeInt(val?: string): number | undefined {
+  if (!val) return undefined;
+  const n = parseInt(val, 10);
+  return isNaN(n) ? undefined : n;
+}
 
 @Controller('beat-my-price')
 export class BeatMyPriceController {
   constructor(private readonly beatMyPriceService: BeatMyPriceService) {}
 
-  // Public — used by frontend form
+  // Public — used by frontend form (stricter rate limit: 3 per 60s per IP)
+  @Throttle({ short: { ttl: 60000, limit: 3 } })
   @Post()
   create(@Body() dto: CreateBeatMyPriceDto) {
     return this.beatMyPriceService.create(dto);
@@ -56,19 +66,19 @@ export class BeatMyPriceController {
 
   @UseGuards(JwtAuthGuard)
   @Patch('bulk/status')
-  bulkUpdateStatus(@Body() dto: { ids: string[]; status: string }) {
+  bulkUpdateStatus(@Body() dto: BulkStatusDto) {
     return this.beatMyPriceService.bulkUpdateStatus(dto.ids, dto.status);
   }
 
   @UseGuards(JwtAuthGuard)
   @Patch('bulk/assign')
-  bulkAssignAgent(@Body() dto: { ids: string[]; agentId: string | null }) {
+  bulkAssignAgent(@Body() dto: BulkAssignDto) {
     return this.beatMyPriceService.bulkAssignAgent(dto.ids, dto.agentId);
   }
 
   @UseGuards(JwtAuthGuard)
   @Post('bulk/delete')
-  bulkDelete(@Body() dto: { ids: string[] }) {
+  bulkDelete(@Body() dto: BulkIdsDto) {
     return this.beatMyPriceService.bulkDelete(dto.ids);
   }
 
@@ -88,9 +98,9 @@ export class BeatMyPriceController {
     @Query('agentId') agentId?: string,
   ) {
     return this.beatMyPriceService.findAll({
-      page: page ? parseInt(page, 10) : undefined,
-      limit: limit ? parseInt(limit, 10) : undefined,
-      status, search, sortBy, sortOrder, dateFrom, dateTo, agentId,
+      page: safeInt(page),
+      limit: safeInt(limit),
+      status, search: search?.slice(0, 500), sortBy, sortOrder, dateFrom, dateTo, agentId,
     });
   }
 
@@ -98,19 +108,19 @@ export class BeatMyPriceController {
 
   @UseGuards(JwtAuthGuard)
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id', ParseUUIDPipe) id: string) {
     return this.beatMyPriceService.findOne(id);
   }
 
   @UseGuards(JwtAuthGuard)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() dto: UpdateBeatMyPriceDto) {
+  update(@Param('id', ParseUUIDPipe) id: string, @Body() dto: UpdateBeatMyPriceDto) {
     return this.beatMyPriceService.update(id, dto);
   }
 
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  remove(@Param('id', ParseUUIDPipe) id: string) {
     return this.beatMyPriceService.remove(id);
   }
 }

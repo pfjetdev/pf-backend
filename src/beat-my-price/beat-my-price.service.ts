@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { EventsService } from '../events/events.service';
 import { CreateBeatMyPriceDto } from './dto/create-beat-my-price.dto';
@@ -21,8 +21,12 @@ interface FindAllQuery {
 
 const AGENT_SELECT = { select: { id: true, name: true } } as const;
 
+const CSV_EXPORT_LIMIT = 10_000;
+
 @Injectable()
 export class BeatMyPriceService {
+  private readonly logger = new Logger(BeatMyPriceService.name);
+
   constructor(
     private prisma: PrismaService,
     private eventsService: EventsService,
@@ -33,6 +37,7 @@ export class BeatMyPriceService {
       data: {
         origin: dto.origin,
         destination: dto.destination,
+        cabinClass: dto.cabinClass,
         competitorPrice: dto.competitorPrice,
         competitorUrl: dto.competitorUrl,
         screenshotUrl: dto.screenshotUrl,
@@ -41,14 +46,18 @@ export class BeatMyPriceService {
       },
     });
 
-    this.eventsService.emitNewBeatMyPrice({
-      id: req.id,
-      email: req.email,
-      origin: req.origin ?? undefined,
-      destination: req.destination ?? undefined,
-      competitorPrice: req.competitorPrice ? Number(req.competitorPrice) : undefined,
-      createdAt: req.createdAt,
-    });
+    try {
+      this.eventsService.emitNewBeatMyPrice({
+        id: req.id,
+        email: req.email,
+        origin: req.origin ?? undefined,
+        destination: req.destination ?? undefined,
+        competitorPrice: req.competitorPrice ? Number(req.competitorPrice) : undefined,
+        createdAt: req.createdAt,
+      });
+    } catch (err) {
+      this.logger.error('Failed to emit new beat-my-price event', err);
+    }
 
     return req;
   }
@@ -152,11 +161,12 @@ export class BeatMyPriceService {
     const items = await this.prisma.beatMyPriceRequest.findMany({
       where,
       orderBy,
+      take: CSV_EXPORT_LIMIT,
       include: { agent: AGENT_SELECT },
     });
 
     return buildCsv(
-      ['ID', 'Email', 'Phone', 'Origin', 'Destination',
+      ['ID', 'Email', 'Phone', 'Origin', 'Destination', 'Cabin Class',
        'Competitor Price', 'Competitor URL', 'Our Price',
        'Status', 'Agent', 'Screenshot', 'Created At'],
       items.map((item) => [
@@ -165,6 +175,7 @@ export class BeatMyPriceService {
         item.phone || '',
         item.origin || '',
         item.destination || '',
+        item.cabinClass || '',
         item.competitorPrice?.toString() || '',
         item.competitorUrl || '',
         item.ourPrice?.toString() || '',

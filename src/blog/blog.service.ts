@@ -1,7 +1,30 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const sanitizeHtml = require('sanitize-html');
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateBlogPostDto } from './dto/create-blog-post.dto';
 import { UpdateBlogPostDto } from './dto/update-blog-post.dto';
+
+/** Allow safe HTML for blog content — strip scripts, event handlers, iframes */
+const SANITIZE_OPTIONS = {
+  allowedTags: (sanitizeHtml.defaults?.allowedTags ?? []).concat([
+    'img', 'h1', 'h2', 'figure', 'figcaption', 'video', 'source',
+  ]),
+  allowedAttributes: {
+    ...(sanitizeHtml.defaults?.allowedAttributes ?? {}),
+    img: ['src', 'alt', 'title', 'width', 'height', 'loading'],
+    a: ['href', 'title', 'target', 'rel'],
+    video: ['src', 'controls', 'width', 'height'],
+    source: ['src', 'type'],
+  },
+  allowedSchemes: ['http', 'https', 'mailto'],
+  disallowedTagsMode: 'discard',
+};
+
+function sanitizeContent(content?: string): string | undefined {
+  if (!content) return content;
+  return sanitizeHtml(content, SANITIZE_OPTIONS);
+}
 
 @Injectable()
 export class BlogService {
@@ -44,7 +67,7 @@ export class BlogService {
         slug: dto.slug,
         title: dto.title,
         excerpt: dto.excerpt,
-        content: dto.content,
+        content: sanitizeContent(dto.content),
         imageUrl: dto.imageUrl,
         category: dto.category,
         authorName: dto.authorName,
@@ -66,7 +89,7 @@ export class BlogService {
         slug: dto.slug,
         title: dto.title,
         excerpt: dto.excerpt,
-        content: dto.content,
+        content: sanitizeContent(dto.content),
         imageUrl: dto.imageUrl,
         category: dto.category,
         authorName: dto.authorName,

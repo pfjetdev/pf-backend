@@ -8,6 +8,7 @@ import {
   Query,
   Body,
   UseGuards,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { DealsService } from './deals.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -33,7 +34,7 @@ export class DealsController {
   @Get(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id', ParseUUIDPipe) id: string) {
     return this.dealsService.findOne(id);
   }
 
@@ -47,14 +48,14 @@ export class DealsController {
   @Patch(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
-  update(@Param('id') id: string, @Body() dto: UpdateDealDto) {
+  update(@Param('id', ParseUUIDPipe) id: string, @Body() dto: UpdateDealDto) {
     return this.dealsService.update(id, dto);
   }
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
-  remove(@Param('id') id: string) {
+  remove(@Param('id', ParseUUIDPipe) id: string) {
     return this.dealsService.remove(id);
   }
 }

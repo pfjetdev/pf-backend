@@ -185,6 +185,7 @@ model BeatMyPriceRequest {
   id              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   origin          String?
   destination     String?
+  cabinClass      String?  @map("cabin_class")
   competitorPrice Decimal? @map("competitor_price") @db.Decimal(10, 2)
   competitorUrl   String?  @map("competitor_url")
   screenshotUrl   String?  @map("screenshot_url")
@@ -199,6 +200,8 @@ model BeatMyPriceRequest {
   updatedAt       DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
 
   @@index([status])
+  @@index([createdAt(sort: Desc)])
+  @@index([agentId])
   @@map("beat_my_price_requests")
 }
 
