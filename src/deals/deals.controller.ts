@@ -16,6 +16,7 @@ import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 import { CreateDealDto } from './dto/create-deal.dto';
 import { UpdateDealDto } from './dto/update-deal.dto';
+import { revalidateTag } from '../common/revalidate';
 
 @Controller('deals')
 export class DealsController {
@@ -41,21 +42,27 @@ export class DealsController {
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
-  create(@Body() dto: CreateDealDto) {
-    return this.dealsService.create(dto);
+  async create(@Body() dto: CreateDealDto) {
+    const result = await this.dealsService.create(dto);
+    revalidateTag('catalog');
+    return result;
   }
 
   @Patch(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
-  update(@Param('id', ParseUUIDPipe) id: string, @Body() dto: UpdateDealDto) {
-    return this.dealsService.update(id, dto);
+  async update(@Param('id', ParseUUIDPipe) id: string, @Body() dto: UpdateDealDto) {
+    const result = await this.dealsService.update(id, dto);
+    revalidateTag('catalog');
+    return result;
   }
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
-  remove(@Param('id', ParseUUIDPipe) id: string) {
-    return this.dealsService.remove(id);
+  async remove(@Param('id', ParseUUIDPipe) id: string) {
+    const result = await this.dealsService.remove(id);
+    revalidateTag('catalog');
+    return result;
   }
 }

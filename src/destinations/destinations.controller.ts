@@ -16,6 +16,7 @@ import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 import { CreateDestinationDto } from './dto/create-destination.dto';
 import { UpdateDestinationDto } from './dto/update-destination.dto';
+import { revalidateTag } from '../common/revalidate';
 
 @Controller('destinations')
 export class DestinationsController {
@@ -43,21 +44,27 @@ export class DestinationsController {
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
-  create(@Body() dto: CreateDestinationDto) {
-    return this.destinationsService.create(dto);
+  async create(@Body() dto: CreateDestinationDto) {
+    const result = await this.destinationsService.create(dto);
+    revalidateTag('catalog');
+    return result;
   }
 
   @Patch(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
-  update(@Param('id', ParseUUIDPipe) id: string, @Body() dto: UpdateDestinationDto) {
-    return this.destinationsService.update(id, dto);
+  async update(@Param('id', ParseUUIDPipe) id: string, @Body() dto: UpdateDestinationDto) {
+    const result = await this.destinationsService.update(id, dto);
+    revalidateTag('catalog');
+    return result;
   }
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
-  remove(@Param('id', ParseUUIDPipe) id: string) {
-    return this.destinationsService.remove(id);
+  async remove(@Param('id', ParseUUIDPipe) id: string) {
+    const result = await this.destinationsService.remove(id);
+    revalidateTag('catalog');
+    return result;
   }
 }

@@ -13,21 +13,23 @@ export class DestinationsService {
    * Returns same shape as the old findAll() for backward compatibility.
    */
   async findAll(region?: string, all = false) {
-    // 1. Aggregate unique destinations from deals
-    const dealAggs = await this.prisma.deal.groupBy({
-      by: ['destinationCode', 'destination', 'countryCode'],
-      _min: { pfPrice: true },
-      where: { isActive: true },
-    });
+    // 1. Aggregate unique destinations from deals + get images — run in parallel
+    const [dealAggs, dealsWithImages, overrides] = await Promise.all([
+      this.prisma.deal.groupBy({
+        by: ['destinationCode', 'destination', 'countryCode'],
+        _min: { pfPrice: true },
+        where: { isActive: true },
+      }),
+      this.prisma.deal.findMany({
+        where: { isActive: true, imageUrl: { not: null } },
+        select: { destinationCode: true, imageUrl: true },
+        orderBy: { sortOrder: 'asc' },
+      }),
+      this.prisma.destination.findMany(),
+    ]);
 
     if (dealAggs.length === 0) return [];
 
-    // Also get one imageUrl per destination (the first deal with an image)
-    const dealsWithImages = await this.prisma.deal.findMany({
-      where: { isActive: true, imageUrl: { not: null } },
-      select: { destinationCode: true, imageUrl: true },
-      orderBy: { sortOrder: 'asc' },
-    });
     const dealImageMap = new Map<string, string>();
     for (const d of dealsWithImages) {
       if (d.imageUrl && !dealImageMap.has(d.destinationCode)) {
@@ -35,11 +37,9 @@ export class DestinationsService {
       }
     }
 
-    // 2. Load all existing destination overrides
-    const overrides = await this.prisma.destination.findMany();
     const overrideMap = new Map(overrides.map((d) => [d.airportCode, d]));
 
-    // 3. Merge: deal-computed data + overrides
+    // 2. Merge: deal-computed data + overrides
     const results = dealAggs.map((agg) => {
       const ov = overrideMap.get(agg.destinationCode);
       const computedRegion =
@@ -61,7 +61,7 @@ export class DestinationsService {
       };
     });
 
-    // 4. Filter
+    // 3. Filter
     let filtered = results;
     if (!all) {
       filtered = filtered.filter((d) => d.isActive);
@@ -70,7 +70,7 @@ export class DestinationsService {
       filtered = filtered.filter((d) => d.region === region);
     }
 
-    // 5. Sort by region, then sortOrder
+    // 4. Sort by region, then sortOrder
     filtered.sort((a, b) => {
       const rc = a.region.localeCompare(b.region);
       if (rc !== 0) return rc;

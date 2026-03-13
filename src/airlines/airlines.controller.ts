@@ -16,6 +16,7 @@ import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 import { CreateAirlineDto } from './dto/create-airline.dto';
 import { UpdateAirlineDto } from './dto/update-airline.dto';
+import { revalidateTag } from '../common/revalidate';
 
 @Controller('airlines')
 export class AirlinesController {
@@ -41,21 +42,30 @@ export class AirlinesController {
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
-  create(@Body() dto: CreateAirlineDto) {
-    return this.airlinesService.create(dto);
+  async create(@Body() dto: CreateAirlineDto) {
+    const result = await this.airlinesService.create(dto);
+    revalidateTag('airlines');
+    revalidateTag('catalog');
+    return result;
   }
 
   @Patch(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
-  update(@Param('id', ParseUUIDPipe) id: string, @Body() dto: UpdateAirlineDto) {
-    return this.airlinesService.update(id, dto);
+  async update(@Param('id', ParseUUIDPipe) id: string, @Body() dto: UpdateAirlineDto) {
+    const result = await this.airlinesService.update(id, dto);
+    revalidateTag('airlines');
+    revalidateTag('catalog');
+    return result;
   }
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
-  remove(@Param('id', ParseUUIDPipe) id: string) {
-    return this.airlinesService.remove(id);
+  async remove(@Param('id', ParseUUIDPipe) id: string) {
+    const result = await this.airlinesService.remove(id);
+    revalidateTag('airlines');
+    revalidateTag('catalog');
+    return result;
   }
 }
